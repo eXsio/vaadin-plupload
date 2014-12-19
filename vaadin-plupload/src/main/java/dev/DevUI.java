@@ -23,6 +23,7 @@
  */
 package dev;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -44,12 +45,24 @@ public class DevUI extends UI {
     protected void init(VaadinRequest request) {
 
         final Plupload uploader = new Plupload();
+        uploader.setImmediate(true);
         uploader.setCaption("Browse");
+        
+        final ProgressBar progress = new ProgressBar();
+        progress.setIndeterminate(false);
+        progress.setValue(0f);
+        progress.setWidth("200px");
+        
+        
+        final Label label = new Label("0%");
+        
 
         uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
 
             @Override
             public void onFilesAdded(PluploadFile[] files) {
+                progress.setValue(0f);
+                label.setValue("0%");
                 for (PluploadFile f : files) {
                     System.out.println(f);
                 }
@@ -60,7 +73,9 @@ public class DevUI extends UI {
 
             @Override
             public void onUploadProgress(PluploadFile file) {
+                label.setValue(file.getPercent() + "%");
                 System.out.println(file.getPercent() + "%");
+                progress.setValue(new Long(file.getPercent()).floatValue()/100);
             }
         });
 
@@ -84,9 +99,11 @@ public class DevUI extends UI {
         FormLayout layout = new FormLayout();
         layout.addComponent(uploader);
         layout.addComponent(start);
+        layout.addComponent(progress);
+        layout.addComponent(label);
         this.setContent(layout);
 
-        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
+        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "500mb");
         uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
         uploader.setOption(PluploadOption.FILTERS, "[{\"title\" : \"Image files\", \"extensions\" : \"jpg,jpeg,gif,png\"}]");
         uploader.init();
