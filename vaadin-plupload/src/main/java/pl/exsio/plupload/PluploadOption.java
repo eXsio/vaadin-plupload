@@ -21,23 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload.client;
-
-import com.vaadin.shared.communication.ClientRpc;
+package pl.exsio.plupload;
 
 /**
  *
  * @author exsio
  */
-public interface PluploadCilentRpc extends ClientRpc {
+public enum PluploadOption {
 
-    void start();
+    CHUNK_SIZE("chunk_size"),
+    FILTERS("fiters"),
+    HEADERS("headers"),
+    RESIZE("resize"),
+    MAX_FILE_SIZE("max_file_size"),
+    MULTI_SELECTION("multi_selection");
 
-    void stop();
+    private String optionName;
 
-    void disableBrowse(boolean disable);
+    private PluploadOption(String optionName) {
+        this.optionName = optionName;
+    }
 
-    void setOption(String name, String value);
-    
-    void init();
+    public String toString() {
+        return this.optionName;
+    }
+
 }

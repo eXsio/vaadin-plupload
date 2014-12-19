@@ -36,15 +36,6 @@ import pl.exsio.plupload.server.PluploadServerRpc;
 @Connect(Plupload.class)
 public class PluploadConnector extends ButtonConnector {
 
-    protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
-
-        @Override
-        public void start() {
-            PluploadJSNIDelegate.startUploader();
-        }
-
-    };
-
     protected PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
 
     public PluploadConnector() {
@@ -52,6 +43,35 @@ public class PluploadConnector extends ButtonConnector {
         registerRpc(PluploadCilentRpc.class, clientRpc);
         PluploadJSNIDelegate.initUploader(getWidget().getElement(), serverRpc);
     }
+
+    protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
+
+        @Override
+        public void start() {
+            PluploadJSNIDelegate.startUploader();
+        }
+
+        @Override
+        public void stop() {
+            PluploadJSNIDelegate.init();
+        }
+
+        @Override
+        public void disableBrowse(boolean disable) {
+            PluploadJSNIDelegate.disableBrowse(disable);
+        }
+
+        @Override
+        public void setOption(String name, String value) {
+            PluploadJSNIDelegate.setOption(name, value);
+        }
+
+        @Override
+        public void init() {
+            PluploadJSNIDelegate.init();
+        }
+
+    };
 
     @Override
     public void init() {

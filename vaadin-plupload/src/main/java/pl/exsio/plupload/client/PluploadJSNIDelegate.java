@@ -37,7 +37,7 @@ public class PluploadJSNIDelegate {
 
         this.uploader = new $wnd.plupload.Uploader({
             browse_button: button,
-            url: 'dummypath',
+            url: 'pluploader-upload-action',
             max_file_size : '1000mb',
             chunk_size: '1mb',
             max_retries: 3
@@ -77,8 +77,6 @@ public class PluploadJSNIDelegate {
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::error()();
         });
-
-        this.uploader.init();
             
      }-*/;
     
@@ -86,6 +84,34 @@ public class PluploadJSNIDelegate {
     /*-{
             
        this.uploader.start();
+            
+    }-*/;
+    
+    public static native void stopUploader()
+    /*-{
+            
+       this.uploader.stop();
+            
+    }-*/;
+    
+    public static native void disableBrowse(boolean disable)
+    /*-{
+            
+       this.uploader.disableBrowse(disable);
+            
+    }-*/;
+    
+    public static native void setOption(String name, String value)
+    /*-{
+            
+       this.uploader.setOption(name, value);
+            
+    }-*/;
+    
+    public static native void init()
+    /*-{
+            
+       this.uploader.init();
             
     }-*/;
 }

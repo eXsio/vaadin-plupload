@@ -21,12 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload;
+package pl.exsio.plupload.ex;
 
 /**
  *
  * @author exsio
  */
-public class PluploadConfig {
-    
+public class PluploadNotInitializedException extends RuntimeException {
+
+    public PluploadNotInitializedException(String msg) {
+        super(msg);
+    }
 }
