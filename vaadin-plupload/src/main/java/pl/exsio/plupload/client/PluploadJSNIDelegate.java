@@ -40,7 +40,9 @@ public class PluploadJSNIDelegate {
             url: 'pluploader-upload-action',
             max_file_size : '1000mb',
             chunk_size: '1mb',
-            max_retries: 3
+            max_retries: 3,
+            runtimes: "html5",
+            multi_selection: true
         });
 
         this.uploader.bind('FilesAdded', function(up, files) {
@@ -104,7 +106,24 @@ public class PluploadJSNIDelegate {
     public static native void setOption(String name, String value)
     /*-{
             
-       this.uploader.setOption(name, value);
+       var tryParseToJSON = function(jsonString) {
+            try {
+                var o = JSON.parse(jsonString);
+                if (o && typeof o === "object" && o !== null) {
+                    return o;
+                }
+            }
+            catch (e) { }
+
+            return false;
+        };     
+       var optionValue = tryParseToJSON(value);
+       if(typeof optionValue !== "object") {
+            optionValue = value;
+       }
+       console.info("setting uploader option "+ name);
+       console.info(optionValue);
+       this.uploader.setOption(name, optionValue);
             
     }-*/;
     

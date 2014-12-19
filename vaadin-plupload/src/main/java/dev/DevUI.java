@@ -88,6 +88,7 @@ public class DevUI extends UI {
 
         uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
         uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
+        uploader.setOption(PluploadOption.FILTERS, "[{\"title\" : \"Image files\", \"extensions\" : \"jpg,jpeg,gif,png\"}]");
         uploader.init();
     }
 
