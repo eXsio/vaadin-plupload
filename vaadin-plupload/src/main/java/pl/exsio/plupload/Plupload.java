@@ -65,11 +65,11 @@ public class Plupload extends Button {
 
     protected boolean initialized = false;
 
-    protected PluploadReceiver receiver;
+    protected transient PluploadReceiver receiver;
 
     protected String uploaderId;
 
-    protected final PluploadQueue queue = new PluploadQueue();
+    protected final transient PluploadQueue queue = new PluploadQueue();
 
     public Plupload() {
         super();
