@@ -24,16 +24,13 @@
 package pl.exsio.plupload;
 
 import com.google.gson.Gson;
-import com.google.gwt.user.client.Random;
-import com.ibm.icu.text.DateFormat;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import java.io.File;
-import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Random;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.client.shared.PluploadState;
 import pl.exsio.plupload.ex.PluploadNotInitializedException;
@@ -58,6 +55,8 @@ public class Plupload extends Button {
 
     protected final Set<FileUploadedListener> fileUploadedListeners = new LinkedHashSet<>();
 
+    protected final Set<InitListener> initListeners = new LinkedHashSet<>();
+
     protected final Set<ErrorListener> errorListeners = new LinkedHashSet<>();
 
     protected final Set<UploadStartListener> uploadStartListeners = new LinkedHashSet<>();
@@ -67,6 +66,8 @@ public class Plupload extends Button {
     protected boolean initialized = false;
 
     protected PluploadReceiver receiver;
+
+    protected String uploaderId;
 
     protected final PluploadQueue queue = new PluploadQueue();
 
@@ -89,8 +90,7 @@ public class Plupload extends Button {
     }
 
     private void postConstruct() {
-        this.receiver = new PluploadReceiver(this.getUploaderId());
-        VaadinSession.getCurrent().addRequestHandler(this.receiver);
+        
         this.addFilesAddedListener(new FilesAddedListener() {
 
             @Override
@@ -178,12 +178,22 @@ public class Plupload extends Button {
             }
         }
 
+        @Override
+        public void confirmInitialization(String remoteUploaderId) {
+            uploaderId = remoteUploaderId;
+            receiver = new PluploadReceiver(remoteUploaderId);
+            VaadinSession.getCurrent().addRequestHandler(receiver);
+            initialized = true;
+            for (InitListener listener : initListeners) {
+                listener.onInitialized(remoteUploaderId);
+            }
+        }
+
     };
 
     public void init() {
         if (!this.initialized) {
             this.getClient().init();
-            this.initialized = true;
         }
     }
 
@@ -192,7 +202,7 @@ public class Plupload extends Button {
     }
 
     public String getUploaderId() {
-        return this.getState().getUploaderId();
+        return this.uploaderId;
     }
 
     public void disableBrowse(boolean disable) {
@@ -265,6 +275,10 @@ public class Plupload extends Button {
     public void addErrorListener(ErrorListener listener) {
         this.errorListeners.add(listener);
     }
+    
+    public void addInitListener(InitListener listener) {
+        this.initListeners.add(listener);
+    }
 
     public void removeFilesAddedListener(FilesAddedListener listener) {
         this.filesAddedListeners.remove(listener);
@@ -296,6 +310,15 @@ public class Plupload extends Button {
 
     public void removeErrorListener(ErrorListener listener) {
         this.errorListeners.remove(listener);
+    }
+    
+    public void removeInitListener(InitListener listener) {
+        this.initListeners.remove(listener);
+    }
+
+    public interface InitListener {
+
+        void onInitialized(String uploaderId);
     }
 
     public interface FilesAddedListener {

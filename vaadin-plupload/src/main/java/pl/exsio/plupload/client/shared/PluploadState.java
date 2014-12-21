@@ -25,18 +25,11 @@ package pl.exsio.plupload.client.shared;
 
 
 import com.vaadin.shared.ui.button.ButtonState;
-import java.util.Random;
 
 /**
  *
  * @author exsio
  */
 public class PluploadState extends ButtonState {
-
-    protected final String uploaderId = ""+(new Random().nextInt(Integer.MAX_VALUE))+(new Random().nextInt(Integer.MAX_VALUE))+(new Random().nextInt(Integer.MAX_VALUE));
-
-    public String getUploaderId() {
-        return uploaderId;
-    }
 
 }

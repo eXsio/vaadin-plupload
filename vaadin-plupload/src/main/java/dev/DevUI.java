@@ -97,6 +97,14 @@ public class DevUI extends UI {
             }
         });
         
+        uploader.addInitListener(new Plupload.InitListener() {
+
+            @Override
+            public void onInitialized(String uploaderId) {
+                System.out.println("Initialized uploader: "+uploaderId);
+            }
+        });
+        
         uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
             
             @Override
@@ -158,7 +166,7 @@ public class DevUI extends UI {
         uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
         uploader.setOption(PluploadOption.FILTERS, "[{\"title\" : \"Image files\", \"extensions\" : \"jpg,jpeg,gif,png\"}]");
         uploader.init();
-        System.out.println(uploader.getUploaderId());
+        
     }
     
 }

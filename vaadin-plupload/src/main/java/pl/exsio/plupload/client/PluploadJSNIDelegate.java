@@ -31,12 +31,12 @@ import com.google.gwt.dom.client.Element;
  */
 public class PluploadJSNIDelegate {
 
-    public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderId) 
+    public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
     /*-{
         $wnd.uploaders = $wnd.uploaders || {};
         var uploader = new $wnd.plupload.Uploader({
             browse_button: button,
-            url: 'pluploader-upload-action/'+uploaderId,
+            url: '',
             max_file_size : '1000mb',
             chunk_size: '1mb',
             max_retries: 3,
@@ -45,6 +45,8 @@ public class PluploadJSNIDelegate {
             multipart: true
         });
             
+        uploader.settings.url = 'pluploader-upload-action/'+uploader.id;     
+        uploader.disableBrowse(true);    
         uploader.bind('FilesAdded', function(up, files) {
             console.log('FILES ADDED');
                 console.info(arguments);
@@ -86,39 +88,39 @@ public class PluploadJSNIDelegate {
             up.settings.multipart_params = {fileId: file.id}
         });
             
-        $wnd.uploaders[uploaderId] = uploader;    
+        $wnd.uploaders[uploaderKey] = uploader;    
 
      }-*/;
     
-    public static native void startUploader(String uploaderId)
+    public static native void startUploader(String uploaderKey)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
-            $wnd.uploaders[uploaderId].start();
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].start();
        }
     }-*/;
     
-    public static native void stopUploader(String uploaderId)
+    public static native void stopUploader(String uploaderKey)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
-            $wnd.uploaders[uploaderId].stop();
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].stop();
        }
             
     }-*/;
     
-    public static native void disableBrowse(String uploaderId, boolean disable)
+    public static native void disableBrowse(String uploaderKey, boolean disable)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {}; 
-       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
-            $wnd.uploaders[uploaderId].disableBrowse(disable);
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].disableBrowse(disable);
        }    
     }-*/;
     
-    public static native void setOption(String uploaderId, String name, String value)
+    public static native void setOption(String uploaderKey, String name, String value)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
             var tryParseToJSON = function(jsonString) {
                  try {
                      var o = JSON.parse(jsonString);
@@ -136,24 +138,26 @@ public class PluploadJSNIDelegate {
             }
             console.info("setting uploader option "+ name);
             console.info(optionValue);
-            $wnd.uploaders[uploaderId].setOption(name, optionValue);
+            $wnd.uploaders[uploaderKey].setOption(name, optionValue);
        }
     }-*/;
     
-    public static native void init(String uploaderId)
+    public static native void init(String uploaderKey, PluploadServerRpc rpc)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {}; 
-       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
-            $wnd.uploaders[uploaderId].init();
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].init(); 
+            rpc.@pl.exsio.plupload.client.PluploadServerRpc::confirmInitialization(Ljava/lang/String;)($wnd.uploaders[uploaderKey].id);
+            $wnd.uploaders[uploaderKey].disableBrowse(false);  
        }    
             
     }-*/;
     
-    public static native void removeFile(String uploaderId, String fileId)
+    public static native void removeFile(String uploaderKey, String fileId)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
-            $wnd.uploaders[uploaderId].removeFile($wnd.uploaders[uploaderId].getFile(fileId));
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].removeFile($wnd.uploaders[uploaderKey].getFile(fileId));
        }   
     }-*/;
 }
