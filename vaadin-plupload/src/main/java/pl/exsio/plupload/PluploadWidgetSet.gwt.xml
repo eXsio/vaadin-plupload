@@ -33,7 +33,6 @@ THE SOFTWARE.
     
  <source path="shared" />
 <source path="client" />
- <source path="server" />
     <!--
      Uncomment the following to compile the widgetset for one browser only.
      This can reduce the GWT compilation time significantly when debugging.
@@ -68,17 +67,6 @@ THE SOFTWARE.
      information and instructions.
     -->
     <!-- <set-configuration-property name="devModeRedirectEnabled" value="true" /> -->
-
-
-    
-
-    
-
-    
-
-    <inherits name="pl.exsio.plupload.PluploadWidgetSet" />
-
-    
 
     
 </module>

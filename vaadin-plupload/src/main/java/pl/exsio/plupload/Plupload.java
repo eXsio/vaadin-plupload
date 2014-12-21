@@ -37,7 +37,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.client.shared.PluploadState;
 import pl.exsio.plupload.ex.PluploadNotInitializedException;
-import pl.exsio.plupload.server.PluploadServerRpc;
+import pl.exsio.plupload.client.PluploadServerRpc;
 
 /**
  *

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload.server;
+package pl.exsio.plupload.client;
 
 import com.vaadin.shared.communication.ServerRpc;
 

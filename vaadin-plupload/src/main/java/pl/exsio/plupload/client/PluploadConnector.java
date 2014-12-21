@@ -28,7 +28,6 @@ import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
 import pl.exsio.plupload.Plupload;
-import pl.exsio.plupload.server.PluploadServerRpc;
 
 /**
  *
