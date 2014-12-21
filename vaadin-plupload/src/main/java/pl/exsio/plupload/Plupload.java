@@ -24,13 +24,19 @@
 package pl.exsio.plupload;
 
 import com.google.gson.Gson;
+import com.google.gwt.user.client.Random;
+import com.ibm.icu.text.DateFormat;
 import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
+import java.io.File;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.apache.commons.codec.digest.DigestUtils;
 import pl.exsio.plupload.client.PluploadCilentRpc;
+import pl.exsio.plupload.client.shared.PluploadState;
 import pl.exsio.plupload.ex.PluploadNotInitializedException;
-import pl.exsio.plupload.model.PluploadFile;
 import pl.exsio.plupload.server.PluploadServerRpc;
 
 /**
@@ -60,20 +66,60 @@ public class Plupload extends Button {
 
     protected boolean initialized = false;
 
+    protected PluploadReceiver receiver;
+
+    protected final PluploadQueue queue = new PluploadQueue();
+
     public Plupload() {
         super();
-        registerRpc(serverRpc);
-
+        this.registerRpc(serverRpc);
+        this.postConstruct();
     }
 
     public Plupload(String caption) {
         super(caption);
-        registerRpc(serverRpc);
+        this.registerRpc(serverRpc);
+        this.postConstruct();
     }
 
     public Plupload(String caption, ClickListener clickListener) {
         super(caption, clickListener);
-        registerRpc(serverRpc);
+        this.registerRpc(serverRpc);
+        this.postConstruct();
+    }
+
+    private void postConstruct() {
+        this.receiver = new PluploadReceiver(this.getUploaderId());
+        VaadinSession.getCurrent().addRequestHandler(this.receiver);
+        this.addFilesAddedListener(new FilesAddedListener() {
+
+            @Override
+            public void onFilesAdded(PluploadFile[] files) {
+                queue.addFiles(files);
+            }
+        });
+        this.addFilesRemovedListener(new FilesRemovedListener() {
+
+            @Override
+            public void onFilesRemoved(PluploadFile[] files) {
+                queue.removeFiles(files);
+            }
+        });
+        this.addFileUploadedListener(new FileUploadedListener() {
+
+            @Override
+            public void onFileUploaded(PluploadFile file) {
+                File uploadedFile = receiver.getUploadedFile(file.getId());
+                if (uploadedFile != null) {
+                    queue.setUploadedFile(file.getId(), uploadedFile);
+                }
+            }
+        });
+    }
+
+    @Override
+    public PluploadState getState() {
+        return (PluploadState) super.getState();
     }
 
     protected PluploadServerRpc serverRpc = new PluploadServerRpc() {
@@ -141,6 +187,14 @@ public class Plupload extends Button {
         }
     }
 
+    public boolean isInitialized() {
+        return this.initialized;
+    }
+
+    public String getUploaderId() {
+        return this.getState().getUploaderId();
+    }
+
     public void disableBrowse(boolean disable) {
         this.getClient().disableBrowse(disable);
     }
@@ -149,7 +203,11 @@ public class Plupload extends Button {
         this.getClient().setOption(name.toString(), value);
     }
 
-    public void start() {
+    public void removeFile(String fileId) {
+        this.getClient().removeFile(fileId);
+    }
+
+    public void start() throws PluploadNotInitializedException {
         if (this.initialized) {
             for (UploadStartListener listener : uploadStartListeners) {
                 listener.onUploadStart();
@@ -158,6 +216,14 @@ public class Plupload extends Button {
         } else {
             throw new PluploadNotInitializedException("You can't start the upload, because the uploader hasn't been initialized");
         }
+    }
+
+    public Set<PluploadFile> getUploadedFiles() {
+        return this.queue.getPluploadFiles(true);
+    }
+
+    public Set<PluploadFile> getFilesInQueue() {
+        return this.queue.getPluploadFiles(false);
     }
 
     public void stop() {

@@ -21,7 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload.model;
+package pl.exsio.plupload;
+
+import java.io.File;
 
 /**
  *
@@ -46,6 +48,8 @@ public class PluploadFile {
     protected long loaded;
 
     protected String name;
+
+    protected transient File uploadedFile;
 
     public int getPercent() {
         return percent;
@@ -117,6 +121,18 @@ public class PluploadFile {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public File getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(File uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+    
+    public boolean isUploaded() {
+        return this.uploadedFile != null;
     }
 
     @Override

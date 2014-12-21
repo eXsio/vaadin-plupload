@@ -23,6 +23,7 @@
  */
 package pl.exsio.plupload.client;
 
+import pl.exsio.plupload.client.shared.PluploadState;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
@@ -37,38 +38,46 @@ import pl.exsio.plupload.server.PluploadServerRpc;
 public class PluploadConnector extends ButtonConnector {
 
     protected PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
+    
+    protected final String uploaderId;
 
     public PluploadConnector() {
         super();
         registerRpc(PluploadCilentRpc.class, clientRpc);
-        PluploadJSNIDelegate.initUploader(getWidget().getElement(), serverRpc);
+        this.uploaderId = this.getState().getUploaderId();
+        PluploadJSNIDelegate.createUploader(this.getWidget().getElement(), serverRpc, this.uploaderId);
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
 
         @Override
         public void start() {
-            PluploadJSNIDelegate.startUploader();
+            PluploadJSNIDelegate.startUploader(uploaderId);
         }
 
         @Override
         public void stop() {
-            PluploadJSNIDelegate.init();
+            PluploadJSNIDelegate.stopUploader(uploaderId);
         }
 
         @Override
         public void disableBrowse(boolean disable) {
-            PluploadJSNIDelegate.disableBrowse(disable);
+            PluploadJSNIDelegate.disableBrowse(uploaderId, disable);
         }
 
         @Override
         public void setOption(String name, String value) {
-            PluploadJSNIDelegate.setOption(name, value);
+            PluploadJSNIDelegate.setOption(uploaderId, name, value);
         }
 
         @Override
         public void init() {
-            PluploadJSNIDelegate.init();
+            PluploadJSNIDelegate.init(uploaderId);
+        }
+
+        @Override
+        public void removeFile(String fileId) {
+            PluploadJSNIDelegate.removeFile(uploaderId, fileId);
         }
 
     };

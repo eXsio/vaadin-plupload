@@ -32,105 +32,129 @@ import pl.exsio.plupload.server.PluploadServerRpc;
  */
 public class PluploadJSNIDelegate {
 
-    public static native void initUploader(Element button, PluploadServerRpc rpc) 
+    public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderId) 
     /*-{
-
-        this.uploader = new $wnd.plupload.Uploader({
+        $wnd.uploaders = $wnd.uploaders || {};
+        var uploader = new $wnd.plupload.Uploader({
             browse_button: button,
-            url: 'pluploader-upload-action',
+            url: 'pluploader-upload-action/'+uploaderId,
             max_file_size : '1000mb',
             chunk_size: '1mb',
             max_retries: 3,
             runtimes: "html5",
-            multi_selection: true
+            multi_selection: true,
+            multipart: true
         });
-
-        this.uploader.bind('FilesAdded', function(up, files) {
+            
+        uploader.bind('FilesAdded', function(up, files) {
+            console.log('FILES ADDED');
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::filesAdded(Ljava/lang/String;)(JSON.stringify(files));
         });
 
-        this.uploader.bind('FilesRemoved', function(up, files) {
+        uploader.bind('FilesRemoved', function(up, files) {
+            console.log('FILES REMOVED');
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::filesRemoved(Ljava/lang/String;)(JSON.stringify(files));
         });
 
-        this.uploader.bind('FileFiltered', function(up, file) {
+        uploader.bind('FileFiltered', function(up, file) {
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::fileFiltered(Ljava/lang/String;)(JSON.stringify(file));
         });
 
-        this.uploader.bind('FileUploaded', function(up, file) {
+        uploader.bind('FileUploaded', function(up, file) {
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::fileUploaded(Ljava/lang/String;)(JSON.stringify(file));
         });
 
-        this.uploader.bind('UploadProgress', function(up, file) {
+        uploader.bind('UploadProgress', function(up, file) {
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::uploadProgress(Ljava/lang/String;)(JSON.stringify(file));
         });
 
-        this.uploader.bind('UploadComplete', function(up, files) {
+        uploader.bind('UploadComplete', function(up, files) {
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::uploadComplete()();
         });
 
-        this.uploader.bind('Error', function(up, files) {
+        uploader.bind('Error', function(up, files) {
                 console.info(arguments);
                 rpc.@pl.exsio.plupload.server.PluploadServerRpc::error()();
         });
             
+        uploader.bind('BeforeUpload', function (up, file) {
+            up.settings.multipart_params = {fileId: file.id}
+        });
+            
+        $wnd.uploaders[uploaderId] = uploader;    
+
      }-*/;
     
-    public static native void startUploader()
+    public static native void startUploader(String uploaderId)
     /*-{
-            
-       this.uploader.start();
-            
-    }-*/;
-    
-    public static native void stopUploader()
-    /*-{
-            
-       this.uploader.stop();
-            
-    }-*/;
-    
-    public static native void disableBrowse(boolean disable)
-    /*-{
-            
-       this.uploader.disableBrowse(disable);
-            
-    }-*/;
-    
-    public static native void setOption(String name, String value)
-    /*-{
-            
-       var tryParseToJSON = function(jsonString) {
-            try {
-                var o = JSON.parse(jsonString);
-                if (o && typeof o === "object" && o !== null) {
-                    return o;
-                }
-            }
-            catch (e) { }
-
-            return false;
-        };     
-       var optionValue = tryParseToJSON(value);
-       if(typeof optionValue !== "object") {
-            optionValue = value;
+       $wnd.uploaders = $wnd.uploaders || {};
+       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+            $wnd.uploaders[uploaderId].start();
        }
-       console.info("setting uploader option "+ name);
-       console.info(optionValue);
-       this.uploader.setOption(name, optionValue);
+    }-*/;
+    
+    public static native void stopUploader(String uploaderId)
+    /*-{
+       $wnd.uploaders = $wnd.uploaders || {};
+       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+            $wnd.uploaders[uploaderId].stop();
+       }
             
     }-*/;
     
-    public static native void init()
+    public static native void disableBrowse(String uploaderId, boolean disable)
     /*-{
+       $wnd.uploaders = $wnd.uploaders || {}; 
+       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+            $wnd.uploaders[uploaderId].disableBrowse(disable);
+       }    
+    }-*/;
+    
+    public static native void setOption(String uploaderId, String name, String value)
+    /*-{
+       $wnd.uploaders = $wnd.uploaders || {};
+       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+            var tryParseToJSON = function(jsonString) {
+                 try {
+                     var o = JSON.parse(jsonString);
+                     if (o && typeof o === "object" && o !== null) {
+                         return o;
+                     }
+                 }
+                 catch (e) { }
+
+                 return false;
+             };     
+            var optionValue = tryParseToJSON(value);
+            if(typeof optionValue !== "object") {
+                 optionValue = value;
+            }
+            console.info("setting uploader option "+ name);
+            console.info(optionValue);
+            $wnd.uploaders[uploaderId].setOption(name, optionValue);
+       }
+    }-*/;
+    
+    public static native void init(String uploaderId)
+    /*-{
+       $wnd.uploaders = $wnd.uploaders || {}; 
+       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+            $wnd.uploaders[uploaderId].init();
+       }    
             
-       this.uploader.init();
-            
+    }-*/;
+    
+    public static native void removeFile(String uploaderId, String fileId)
+    /*-{
+       $wnd.uploaders = $wnd.uploaders || {};
+       if(typeof $wnd.uploaders[uploaderId] === 'object') {     
+            $wnd.uploaders[uploaderId].removeFile($wnd.uploaders[uploaderId].getFile(fileId));
+       }   
     }-*/;
 }
