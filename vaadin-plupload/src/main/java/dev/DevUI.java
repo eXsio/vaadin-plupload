@@ -96,12 +96,14 @@ public class DevUI extends UI {
                 }
             }
         });
-        
+         final Button start = new Button("Start");
+         start.setEnabled(false);
         uploader.addInitListener(new Plupload.InitListener() {
 
             @Override
             public void onInitialized(String uploaderId) {
                 System.out.println("Initialized uploader: "+uploaderId);
+                start.setEnabled(true);
             }
         });
         
@@ -133,7 +135,7 @@ public class DevUI extends UI {
             }
         });
         
-        Button start = new Button("Start");
+       
         start.addClickListener(new Button.ClickListener() {
             
             @Override
