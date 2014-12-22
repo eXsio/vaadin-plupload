@@ -48,10 +48,13 @@ public class PluploadReceiver implements RequestHandler {
 
     protected static final String UPLOAD_ACTION_PATH = "//pluploader-upload-action/";
 
-    private static final String CACHE_PATH = "./temp/";
+    private static final String CACHE_PATH = System.getProperty("java.io.tmpdir") + File.separator;
+
     private static final int CACHE_SIZE = 1000 * (int) Math.pow(10, 6);
-    private static final int MAX_REQUEST_SIZE = 100 * (int) Math.pow(10, 6);
-    private static final int MAX_FILE_SIZE = 100 * (int) Math.pow(10, 6);
+
+    private static final int MAX_REQUEST_SIZE = 1000 * (int) Math.pow(10, 6);
+
+    private static final int MAX_FILE_SIZE = 1000 * (int) Math.pow(10, 6);
 
     protected final String uploaderId;
 
@@ -59,10 +62,13 @@ public class PluploadReceiver implements RequestHandler {
 
     protected final Map<String, File> uploadedFiles;
 
+    protected final Map<String, PluploadProgress> progressMap;
+
     public PluploadReceiver(String uploaderId) {
         this.uploaderId = uploaderId;
         this.uploadActionPath = UPLOAD_ACTION_PATH + uploaderId;
         this.uploadedFiles = new HashMap<>();
+        this.progressMap = new HashMap<>();
     }
 
     public File getUploadedFile(String fileId) {
@@ -82,45 +88,80 @@ public class PluploadReceiver implements RequestHandler {
                 HttpServletRequest req = vsr.getHttpServletRequest();
                 if (ServletFileUpload.isMultipartContent(req)) {
                     try {
-                        DiskFileItemFactory factory = new DiskFileItemFactory();
-                        // Set factory constraints
-                        factory.setRepository(new File(CACHE_PATH));
-                        factory.setSizeThreshold(CACHE_SIZE);
-                        
-                        // Create a new file upload handler
-                        ServletFileUpload upload = new ServletFileUpload(factory);
-                        // Set overall request size constraint
-                        upload.setSizeMax(MAX_REQUEST_SIZE);
-                        upload.setFileSizeMax(MAX_FILE_SIZE);
-                        
-                        // Parse the request
-                        @SuppressWarnings("unchecked")
-                                List<FileItem> items = upload.parseRequest(req);
-                        
-                        // Process the uploaded items
-                        Iterator iter = items.iterator();
-                        while (iter.hasNext()) {
-                            FileItem item = (FileItem) iter.next();
-                            
-                            if (item.isFormField()) {
-                                System.out.println(item.getFieldName()+": "+item.getString());
-                            } else {
-                                System.out.println("Data: "+ item.getSize());
-                            }
+
+                        ServletFileUpload upload = this.createServletFileUpload();
+                        List<FileItem> items = upload.parseRequest(req);
+                        PluploadChunk chunk = this.createChunk(items);
+                        PluploadProgress progress = this.getProgress(chunk);
+
+                        if (progress.appendChunk(chunk)) {
+                            this.uploadedFiles.put(chunk.getFileId(), progress.getUploadedFile());
+                            this.progressMap.remove(chunk.getFileId());
+                            response.getWriter().append("file " + chunk.getName() + " uploaded successfuly");
+                        } else {
+                            response.getWriter().append("file chunk " + (chunk.getChunk() + 1) + " of " + chunk.getChunks() + " uploaded successfuly");
                         }
+                        response.setContentType("text/plain");
                     } catch (FileUploadException ex) {
+                        response.getWriter().append("file upload unsuccessful");
                         throw new IOException(ex);
                     }
                 }
             }
 
-            response.setContentType("text/plain");
-            response.getWriter().append(
-                    "upload stub");
             return true;
         } else {
             return false;
         }
+    }
+
+    private PluploadProgress getProgress(PluploadChunk chunk) {
+        PluploadProgress progress = null;
+        if (!this.progressMap.containsKey(chunk.getFileId())) {
+            progress = new PluploadProgress();
+            this.progressMap.put(chunk.getFileId(), progress);
+        } else {
+            progress = this.progressMap.get(chunk.getFileId());
+        }
+        return progress;
+    }
+
+    private PluploadChunk createChunk(List<FileItem> items) throws NumberFormatException {
+        PluploadChunk chunk = new PluploadChunk();
+        Iterator iter = items.iterator();
+        while (iter.hasNext()) {
+            FileItem item = (FileItem) iter.next();
+
+            if (item.isFormField()) {
+                switch (item.getFieldName()) {
+                    case "fileId":
+                        chunk.setFileId(item.getString());
+                        break;
+                    case "name":
+                        chunk.setName(item.getString());
+                        break;
+                    case "chunk":
+                        chunk.setChunk(Integer.parseInt(item.getString()));
+                        break;
+                    case "chunks":
+                        chunk.setChunks(Integer.parseInt(item.getString()));
+                }
+
+            } else {
+                chunk.setData(item);
+            }
+        }
+        return chunk;
+    }
+
+    private ServletFileUpload createServletFileUpload() {
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setRepository(new File(CACHE_PATH));
+        factory.setSizeThreshold(CACHE_SIZE);
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        upload.setSizeMax(MAX_REQUEST_SIZE);
+        upload.setFileSizeMax(MAX_FILE_SIZE);
+        return upload;
     }
 
 }

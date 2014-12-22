@@ -24,6 +24,7 @@
 package pl.exsio.plupload;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  *
@@ -130,7 +131,7 @@ public class PluploadFile {
     public void setUploadedFile(File uploadedFile) {
         this.uploadedFile = uploadedFile;
     }
-    
+
     public boolean isUploaded() {
         return this.uploadedFile != null;
     }
@@ -138,6 +139,28 @@ public class PluploadFile {
     @Override
     public String toString() {
         return this.name + " (type: " + this.type + ", size: " + this.size + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PluploadFile other = (PluploadFile) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
 
 }

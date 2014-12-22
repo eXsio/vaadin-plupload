@@ -37,6 +37,13 @@ public class PluploadQueue {
 
     protected final Map<String, PluploadFile> queue;
 
+    protected enum Mode {
+
+        ALL,
+        UPLOADED,
+        NOT_UPLOADED
+    }
+
     public PluploadQueue() {
         this.queue = new LinkedHashMap<>();
     }
@@ -63,19 +70,24 @@ public class PluploadQueue {
         }
     }
 
+    public boolean isEmpty() {
+        return this.getFileIds(Mode.NOT_UPLOADED).isEmpty();
+    }
+
     public void setUploadedFile(String fileId, File uploadedFile) {
         if (this.queue.containsKey(fileId)) {
             this.queue.get(fileId).setUploadedFile(uploadedFile);
         }
     }
 
-    public Set<String> getFileIds(boolean uploadedOnly) {
-        if (!uploadedOnly) {
+    public Set<String> getFileIds(Mode mode) {
+        if (Mode.ALL.equals(mode)) {
             return this.queue.keySet();
         } else {
             Set<String> ids = new LinkedHashSet();
             for (String fileId : this.queue.keySet()) {
-                if (this.queue.get(fileId).isUploaded()) {
+                if ((this.queue.get(fileId).isUploaded() && Mode.UPLOADED.equals(mode))
+                        || (!this.queue.get(fileId).isUploaded() && Mode.NOT_UPLOADED.equals(mode))) {
                     ids.add(fileId);
                 }
             }
@@ -83,14 +95,17 @@ public class PluploadQueue {
         }
     }
 
-    public Set<PluploadFile> getPluploadFiles(boolean uploadedOnly) {
+    public Set<PluploadFile> getPluploadFiles(Mode mode) {
         Set<PluploadFile> files = new LinkedHashSet();
         for (String fileId : this.queue.keySet()) {
             PluploadFile file = this.queue.get(fileId);
-            if (file.isUploaded()) {
+            if (Mode.ALL.equals(mode)
+                    || (file.isUploaded() && Mode.UPLOADED.equals(mode))
+                    || (!file.isUploaded() && Mode.NOT_UPLOADED.equals(mode))) {
                 files.add(file);
             }
         }
         return files;
     }
+
 }

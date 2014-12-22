@@ -23,18 +23,20 @@
  */
 package pl.exsio.plupload;
 
+import pl.exsio.plupload.helper.filter.PluploadFilter;
+import pl.exsio.plupload.helper.filter.PluploadFilters;
 import com.google.gson.Gson;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import java.io.File;
 import java.util.LinkedHashSet;
-import java.util.Random;
 import java.util.Set;
 import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.client.shared.PluploadState;
 import pl.exsio.plupload.ex.PluploadNotInitializedException;
 import pl.exsio.plupload.client.PluploadServerRpc;
+import pl.exsio.plupload.helper.resize.PluploadImageResize;
 
 /**
  *
@@ -71,6 +73,10 @@ public class Plupload extends Button {
 
     protected final transient PluploadQueue queue = new PluploadQueue();
 
+    protected final transient PluploadFilters filters = new PluploadFilters();
+
+    protected PluploadImageResize imageResize = new PluploadImageResize();
+
     public Plupload() {
         super();
         this.registerRpc(serverRpc);
@@ -90,7 +96,7 @@ public class Plupload extends Button {
     }
 
     private void postConstruct() {
-        
+
         this.addFilesAddedListener(new FilesAddedListener() {
 
             @Override
@@ -205,6 +211,12 @@ public class Plupload extends Button {
         return this.uploaderId;
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        this.disableBrowse(!enabled);
+    }
+
     public void disableBrowse(boolean disable) {
         this.getClient().disableBrowse(disable);
     }
@@ -217,23 +229,44 @@ public class Plupload extends Button {
         this.getClient().removeFile(fileId);
     }
 
+    public void addFilter(PluploadFilter filter) {
+        this.filters.addMimeType(filter);
+        this.setOption(PluploadOption.FILTERS, new Gson().toJson(this.filters));
+    }
+
+    public void removeFilter(PluploadFilter filter) {
+        this.filters.removeMimeType(filter);
+        this.setOption(PluploadOption.FILTERS, new Gson().toJson(this.filters));
+    }
+
+    public PluploadImageResize getImageResize() {
+        return this.imageResize;
+    }
+
+    public void setImageResize(PluploadImageResize resize) {
+        this.imageResize = resize;
+        this.setOption(PluploadOption.RESIZE, new Gson().toJson(this.imageResize));
+    }
+
     public void start() throws PluploadNotInitializedException {
         if (this.initialized) {
-            for (UploadStartListener listener : uploadStartListeners) {
-                listener.onUploadStart();
+            if (!this.queue.isEmpty()) {
+                for (UploadStartListener listener : uploadStartListeners) {
+                    listener.onUploadStart();
+                }
+                this.getClient().start();
             }
-            this.getClient().start();
         } else {
             throw new PluploadNotInitializedException("You can't start the upload, because the uploader hasn't been initialized");
         }
     }
 
     public Set<PluploadFile> getUploadedFiles() {
-        return this.queue.getPluploadFiles(true);
+        return this.queue.getPluploadFiles(PluploadQueue.Mode.UPLOADED);
     }
 
-    public Set<PluploadFile> getFilesInQueue() {
-        return this.queue.getPluploadFiles(false);
+    public Set<PluploadFile> getQueuedFiles() {
+        return this.queue.getPluploadFiles(PluploadQueue.Mode.NOT_UPLOADED);
     }
 
     public void stop() {
@@ -275,7 +308,7 @@ public class Plupload extends Button {
     public void addErrorListener(ErrorListener listener) {
         this.errorListeners.add(listener);
     }
-    
+
     public void addInitListener(InitListener listener) {
         this.initListeners.add(listener);
     }
@@ -311,7 +344,7 @@ public class Plupload extends Button {
     public void removeErrorListener(ErrorListener listener) {
         this.errorListeners.remove(listener);
     }
-    
+
     public void removeInitListener(InitListener listener) {
         this.initListeners.remove(listener);
     }

@@ -34,38 +34,40 @@ import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadOption;
 import pl.exsio.plupload.ex.PluploadNotInitializedException;
 import pl.exsio.plupload.PluploadFile;
+import pl.exsio.plupload.helper.filter.PluploadFilter;
+import pl.exsio.plupload.helper.resize.PluploadImageResize;
 
 @SuppressWarnings("serial")
 public class DevUI extends UI {
-    
+
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = DevUI.class, widgetset = "pl.exsio.plupload.PluploadWidgetSet")
     public static class DevServlet extends VaadinServlet {
     }
-    
-    private Map<String, Button> removeButtons = new HashMap();
-    
-    private Map<String, ProgressBar> progressBars = new HashMap();
-    
-    private Map<String, Label> progressLabels = new HashMap();
-    
-    private Map<String, Layout> controls = new HashMap();
-    
+
+    private final Map<String, Button> removeButtons = new HashMap();
+
+    private final Map<String, ProgressBar> progressBars = new HashMap();
+
+    private final Map<String, Label> progressLabels = new HashMap();
+
+    private final Map<String, Layout> controls = new HashMap();
+
     @Override
     protected void init(VaadinRequest request) {
-        
+
         final Plupload uploader = new Plupload();
         final VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSpacing(true);
         mainLayout.setMargin(true);
         uploader.setImmediate(true);
         uploader.setCaption("Browse");
-        
+
         uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
-            
+
             @Override
             public void onFilesAdded(PluploadFile[] files) {
-                
+
                 for (final PluploadFile file : files) {
                     System.out.println(file.toString());
                     HorizontalLayout layout = new HorizontalLayout();
@@ -77,13 +79,13 @@ public class DevUI extends UI {
                     Label nameLabel = new Label(file.getName());
                     Label progressLabel = new Label("0%");
                     remove.addClickListener(new Button.ClickListener() {
-                        
+
                         @Override
                         public void buttonClick(Button.ClickEvent event) {
                             uploader.removeFile(file.getId());
                         }
                     });
-                    
+
                     removeButtons.put(file.getId(), remove);
                     progressBars.put(file.getId(), progress);
                     progressLabels.put(file.getId(), progressLabel);
@@ -96,19 +98,19 @@ public class DevUI extends UI {
                 }
             }
         });
-         final Button start = new Button("Start");
-         start.setEnabled(false);
+        final Button start = new Button("Start");
+        start.setEnabled(false);
         uploader.addInitListener(new Plupload.InitListener() {
 
             @Override
             public void onInitialized(String uploaderId) {
-                System.out.println("Initialized uploader: "+uploaderId);
+                System.out.println("Initialized uploader: " + uploaderId);
                 start.setEnabled(true);
             }
         });
-        
+
         uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
-            
+
             @Override
             public void onUploadProgress(PluploadFile file) {
                 progressLabels.get(file.getId()).setValue(file.getPercent() + "%");
@@ -116,17 +118,20 @@ public class DevUI extends UI {
                 progressBars.get(file.getId()).setValue(new Long(file.getPercent()).floatValue() / 100);
             }
         });
-        
+
         uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-            
+
             @Override
             public void onUploadComplete() {
                 System.out.println("upload complete");
+                for (PluploadFile f : uploader.getUploadedFiles()) {
+                    System.out.println(f.getUploadedFile().getAbsolutePath());
+                }
             }
         });
-        
+
         uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
-            
+
             @Override
             public void onFilesRemoved(PluploadFile[] files) {
                 for (PluploadFile file : files) {
@@ -134,13 +139,12 @@ public class DevUI extends UI {
                 }
             }
         });
-        
-       
+
         start.addClickListener(new Button.ClickListener() {
-            
+
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                
+
                 try {
                     uploader.start();
                 } catch (PluploadNotInitializedException ex) {
@@ -149,26 +153,29 @@ public class DevUI extends UI {
                 }
             }
         });
-        
+
         Button stop = new Button("Stop");
         stop.addClickListener(new Button.ClickListener() {
-            
+
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 uploader.stop();
             }
         });
-        
+
         mainLayout.addComponent(uploader);
         mainLayout.addComponent(start);
         mainLayout.addComponent(stop);
         this.setContent(mainLayout);
-        
-        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "500mb");
+
+        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
+        uploader.setOption(PluploadOption.MAX_RETRIES, "5");
+        uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
         uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
-        uploader.setOption(PluploadOption.FILTERS, "[{\"title\" : \"Image files\", \"extensions\" : \"jpg,jpeg,gif,png\"}]");
+        uploader.addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
+        uploader.setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setWidth(200).setHeight(100));
         uploader.init();
-        
+
     }
-    
+
 }

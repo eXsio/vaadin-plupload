@@ -132,9 +132,22 @@ public class PluploadJSNIDelegate {
 
                  return false;
              };     
+            
+            var isNumber = function(n) {
+                return !isNaN(parseFloat(n)) && isFinite(n);
+            }
+            
             var optionValue = tryParseToJSON(value);
             if(typeof optionValue !== "object") {
-                 optionValue = value;
+                 if(value.toLowerCase() == "true") {
+                    optionValue = true;
+                 } else if(value.toLowerCase() == "false") {
+                    optionValue = false;
+                 } else if(isNumber(value)) {
+                    optionValue = value * 1;
+                 } else {
+                    optionValue = value;
+                 }   
             }
             console.info("setting uploader option "+ name);
             console.info(optionValue);

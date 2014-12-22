@@ -23,28 +23,67 @@
  */
 package pl.exsio.plupload;
 
+import org.apache.commons.fileupload.FileItem;
+
 /**
  *
  * @author exsio
  */
-public enum PluploadOption {
+public class PluploadChunk {
 
-    CHUNK_SIZE("chunk_size"),
-    FILTERS("filters"),
-    RESIZE("resize"),
-    MAX_FILE_SIZE("max_file_size"),
-    MAX_RETRIES("max_retries"),
-    MULTI_SELECTION("multi_selection"),
-    PREVENT_DUPLICATES("prevent_duplicates");
+    protected String fileId;
 
-    private String optionName;
+    protected String name;
 
-    private PluploadOption(String optionName) {
-        this.optionName = optionName;
+    protected int chunk;
+
+    protected int chunks;
+
+    protected FileItem data;
+
+    public String getFileId() {
+        return fileId;
     }
 
-    public String toString() {
-        return this.optionName;
+    public PluploadChunk setFileId(String fileId) {
+        this.fileId = fileId;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public PluploadChunk setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public int getChunk() {
+        return chunk;
+    }
+
+    public PluploadChunk setChunk(int chunk) {
+        this.chunk = chunk;
+        return this;
+    }
+
+    public int getChunks() {
+        return chunks;
+    }
+
+    public PluploadChunk setChunks(int chunks) {
+        this.chunks = chunks;
+        return this;
+    }
+
+    public FileItem getData() {
+        return data;
+    }
+
+    public PluploadChunk setData(FileItem data) {
+        this.data = data;
+        return this;
     }
 
 }
