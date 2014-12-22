@@ -38,7 +38,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.FileCleanerCleanup;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileCleaningTracker;
 
 /**
  *
@@ -50,7 +52,7 @@ public class PluploadReceiver implements RequestHandler {
 
     private static final String CACHE_PATH = System.getProperty("java.io.tmpdir") + File.separator;
 
-    private static final int CACHE_SIZE = 1000 * (int) Math.pow(10, 6);
+    private static final int CACHE_SIZE = (int) Math.pow(10, 6);
 
     private static final int MAX_REQUEST_SIZE = 1000 * (int) Math.pow(10, 6);
 
@@ -89,7 +91,7 @@ public class PluploadReceiver implements RequestHandler {
                 if (ServletFileUpload.isMultipartContent(req)) {
                     try {
 
-                        ServletFileUpload upload = this.createServletFileUpload();
+                        ServletFileUpload upload = this.createServletFileUpload(req);
                         List<FileItem> items = upload.parseRequest(req);
                         PluploadChunk chunk = this.createChunk(items);
                         PluploadProgress progress = this.getProgress(chunk);
@@ -153,10 +155,12 @@ public class PluploadReceiver implements RequestHandler {
         return chunk;
     }
 
-    private ServletFileUpload createServletFileUpload() {
+    private ServletFileUpload createServletFileUpload(HttpServletRequest req) {
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setRepository(new File(CACHE_PATH));
         factory.setSizeThreshold(CACHE_SIZE);
+        FileCleaningTracker fileCleaningTracker = FileCleanerCleanup.getFileCleaningTracker(req.getServletContext());
+        factory.setFileCleaningTracker(fileCleaningTracker);
         ServletFileUpload upload = new ServletFileUpload(factory);
         upload.setSizeMax(MAX_REQUEST_SIZE);
         upload.setFileSizeMax(MAX_FILE_SIZE);
