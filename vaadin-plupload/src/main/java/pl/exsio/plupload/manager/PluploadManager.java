@@ -265,6 +265,7 @@ public class PluploadManager extends VerticalLayout {
                 for (PluploadFile file : files) {
                     removeItem(file.getId());
                 }
+                toggleStartButton();
             }
         });
     }
@@ -282,11 +283,13 @@ public class PluploadManager extends VerticalLayout {
                     }
                     addItem(file.getId(), item);
                 }
-                if (uploader.getQueuedFiles().length > 0) {
-                    startButton.setEnabled(true);
-                }
+                toggleStartButton();
             }
         });
+    }
+    
+    private void toggleStartButton() {
+        startButton.setEnabled(uploader.getQueuedFiles().length > 0);
     }
 
     protected void addItem(String fileId, Item item) {
