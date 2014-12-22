@@ -108,20 +108,23 @@ public class Plupload extends Button {
 
     private void postConstruct() {
 
-        this.addFilesAddedListener(new FilesAddedListener() {
+        this.handleFilesAdded();
+        this.handleFilesRemoved();
+        this.handleFileUploaded();
+        this.handleUploadComplete();
+    }
+
+    private void handleUploadComplete() {
+        this.addUploadCompleteListener(new UploadCompleteListener() {
 
             @Override
-            public void onFilesAdded(PluploadFile[] files) {
-                queue.addFiles(files);
+            public void onUploadComplete() {
+                uploadStarted = false;
             }
         });
-        this.addFilesRemovedListener(new FilesRemovedListener() {
+    }
 
-            @Override
-            public void onFilesRemoved(PluploadFile[] files) {
-                queue.removeFiles(files);
-            }
-        });
+    private void handleFileUploaded() {
         this.addFileUploadedListener(new FileUploadedListener() {
 
             @Override
@@ -129,15 +132,28 @@ public class Plupload extends Button {
                 File uploadedFile = receiver.getUploadedFile(file.getId());
                 if (uploadedFile != null) {
                     queue.setUploadedFile(file.getId(), uploadedFile);
+                    file.setUploadedFile(uploadedFile);
                 }
             }
         });
+    }
 
-        this.addUploadCompleteListener(new UploadCompleteListener() {
+    private void handleFilesRemoved() {
+        this.addFilesRemovedListener(new FilesRemovedListener() {
 
             @Override
-            public void onUploadComplete() {
-                uploadStarted = false;
+            public void onFilesRemoved(PluploadFile[] files) {
+                queue.removeFiles(files);
+            }
+        });
+    }
+
+    private void handleFilesAdded() {
+        this.addFilesAddedListener(new FilesAddedListener() {
+
+            @Override
+            public void onFilesAdded(PluploadFile[] files) {
+                queue.addFiles(files);
             }
         });
     }
@@ -289,12 +305,14 @@ public class Plupload extends Button {
         }
     }
 
-    public Set<PluploadFile> getUploadedFiles() {
-        return this.queue.getPluploadFiles(PluploadQueue.Mode.UPLOADED);
+    public PluploadFile[] getUploadedFiles() {
+        Set<PluploadFile> files = this.queue.getPluploadFiles(PluploadQueue.Mode.UPLOADED);
+        return files.toArray(new PluploadFile[files.size()]);
     }
 
-    public Set<PluploadFile> getQueuedFiles() {
-        return this.queue.getPluploadFiles(PluploadQueue.Mode.NOT_UPLOADED);
+    public PluploadFile[] getQueuedFiles() {
+        Set<PluploadFile> files = this.queue.getPluploadFiles(PluploadQueue.Mode.NOT_UPLOADED);
+        return files.toArray(new PluploadFile[files.size()]);
     }
 
     public Plupload stop() {

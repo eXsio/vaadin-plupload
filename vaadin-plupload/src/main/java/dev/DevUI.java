@@ -27,13 +27,11 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
 import javax.servlet.annotation.WebServlet;
 import pl.exsio.plupload.Plupload;
-import pl.exsio.plupload.PluploadOption;
-import pl.exsio.plupload.ex.PluploadNotInitializedException;
 import pl.exsio.plupload.PluploadFile;
+import pl.exsio.plupload.field.PluploadField;
 import pl.exsio.plupload.manager.PluploadManager;
 
 @SuppressWarnings("serial")
@@ -56,6 +54,21 @@ public class DevUI extends UI {
 
         mainLayout.addComponent(mgr);
         mainLayout.addComponent(mgr2);
+
+        final PluploadField<File> field = new PluploadField(File.class);
+        field.init();
+        field.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
+
+            @Override
+            public void onUploadComplete() {
+                File file = field.getValue();
+
+                System.out.println(file != null ? file.getAbsolutePath() : "null");
+            }
+        });
+
+        mainLayout.addComponent(field);
+
         this.setContent(mainLayout);
 
     }

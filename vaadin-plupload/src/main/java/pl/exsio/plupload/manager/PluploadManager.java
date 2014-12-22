@@ -1,3 +1,26 @@
+/* 
+ * The MIT License
+ *
+ * Copyright 2014 exsio.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package pl.exsio.plupload.manager;
 
 import com.vaadin.server.FontAwesome;
@@ -45,13 +68,25 @@ public class PluploadManager extends VerticalLayout {
 
     public PluploadManager() {
         this.controls = new HorizontalLayout();
-
         this.itemsContainer = new VerticalLayout();
         this.itemsMap = new LinkedHashMap();
+        this.postConstruct();
+    }
+
+    private void postConstruct() {
+
         this.initManager();
         this.initControls();
         this.initItems();
-        this.initListeners();
+        this.handleFilesAdded();
+        this.handleFilesRemoved();
+        this.handleUploadStart();
+        this.handleUploadStop();
+        this.handleUploadProgress();
+        this.handleFileUploaded();
+        this.handleUploadComplete();
+        this.handleStartButtonClick();
+        this.handleStopButtonClick();
     }
 
     private void initManager() {
@@ -114,7 +149,7 @@ public class PluploadManager extends VerticalLayout {
         return this;
     }
 
-    public Set<PluploadFile> getUploadedFiles() {
+    public PluploadFile[] getUploadedFiles() {
         return this.uploader.getUploadedFiles();
     }
 
@@ -148,7 +183,98 @@ public class PluploadManager extends VerticalLayout {
         return this;
     }
 
-    private void initListeners() {
+    private void handleStopButtonClick() {
+        this.stopButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                uploader.stop();
+            }
+        });
+    }
+
+    private void handleStartButtonClick() {
+        this.startButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                uploader.start();
+            }
+        });
+    }
+
+    private void handleUploadComplete() {
+        this.uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
+
+            @Override
+            public void onUploadComplete() {
+                if (uploader.getQueuedFiles().length == 0) {
+                    startButton.setEnabled(false);
+                }
+                stopButton.setEnabled(false);
+            }
+        });
+    }
+
+    private void handleFileUploaded() {
+        this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
+
+            @Override
+            public void onFileUploaded(PluploadFile file) {
+                if (itemsMap.containsKey(file.getId())) {
+                    itemsMap.get(file.getId()).setUploaded();
+                }
+            }
+        });
+    }
+
+    private void handleUploadProgress() {
+        this.uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
+
+            @Override
+            public void onUploadProgress(PluploadFile file) {
+                if (itemsMap.containsKey(file.getId())) {
+                    itemsMap.get(file.getId()).setProgress(file.getPercent());
+                }
+            }
+        });
+    }
+
+    private void handleUploadStop() {
+        this.uploader.addUploadStopListener(new Plupload.UploadStopListener() {
+
+            @Override
+            public void onUploadStop() {
+                startButton.setEnabled(true);
+                stopButton.setEnabled(false);
+            }
+        });
+    }
+
+    private void handleUploadStart() {
+        this.uploader.addUploadStartListener(new Plupload.UploadStartListener() {
+
+            @Override
+            public void onUploadStart() {
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+            }
+        });
+    }
+
+    private void handleFilesRemoved() {
+        this.uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
+
+            @Override
+            public void onFilesRemoved(PluploadFile[] files) {
+                for (PluploadFile file : files) {
+                    removeItem(file.getId());
+                }
+            }
+        });
+    }
+
+    private void handleFilesAdded() {
         this.uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
 
             @Override
@@ -161,83 +287,9 @@ public class PluploadManager extends VerticalLayout {
                     }
                     addItem(file.getId(), item);
                 }
-                if (!uploader.getQueuedFiles().isEmpty()) {
+                if (uploader.getQueuedFiles().length > 0) {
                     startButton.setEnabled(true);
                 }
-            }
-        });
-
-        this.uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
-
-            @Override
-            public void onFilesRemoved(PluploadFile[] files) {
-                for (PluploadFile file : files) {
-                    removeItem(file.getId());
-                }
-            }
-        });
-        this.uploader.addUploadStartListener(new Plupload.UploadStartListener() {
-
-            @Override
-            public void onUploadStart() {
-                startButton.setEnabled(false);
-                stopButton.setEnabled(true);
-            }
-        });
-
-        this.uploader.addUploadStopListener(new Plupload.UploadStopListener() {
-
-            @Override
-            public void onUploadStop() {
-                startButton.setEnabled(true);
-                stopButton.setEnabled(false);
-            }
-        });
-
-        this.uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
-
-            @Override
-            public void onUploadProgress(PluploadFile file) {
-                if (itemsMap.containsKey(file.getId())) {
-                    itemsMap.get(file.getId()).setProgress(file.getPercent());
-                }
-            }
-        });
-
-        this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
-
-            @Override
-            public void onFileUploaded(PluploadFile file) {
-                if (itemsMap.containsKey(file.getId())) {
-                    itemsMap.get(file.getId()).setUploaded();
-                }
-            }
-        });
-
-        this.uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-
-            @Override
-            public void onUploadComplete() {
-                if (uploader.getQueuedFiles().isEmpty()) {
-                    startButton.setEnabled(false);
-                }
-                stopButton.setEnabled(false);
-            }
-        });
-
-        this.startButton.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                uploader.start();
-            }
-        });
-
-        this.stopButton.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                uploader.stop();
             }
         });
     }

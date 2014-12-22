@@ -21,23 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload.util;
+package pl.exsio.plupload.ex;
 
 /**
  *
  * @author exsio
  */
-public class PluploadUtil {
+public class UnsupportedFieldTypeException extends RuntimeException {
 
-    public static String trimTextInTheMiddle(String text, int length) {
-
-        if (text.length() <= length) {
-            return text;
-        } else {
-            String prefix = text.substring(0, (int) Math.floor(length / 2));
-            String suffix = text.substring(text.length() - (int) Math.ceil(length / 2), text.length());
-            return new StringBuilder(prefix).append("..").append(suffix).toString();
-        }
-
+    public UnsupportedFieldTypeException(String msg) {
+        super(msg);
     }
 }
