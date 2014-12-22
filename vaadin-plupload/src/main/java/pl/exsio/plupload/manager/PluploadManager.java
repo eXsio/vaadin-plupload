@@ -117,11 +117,6 @@ public class PluploadManager extends VerticalLayout {
 
     }
 
-    public PluploadManager init() {
-        this.uploader.init();
-        return this;
-    }
-
     public Plupload getUploader() {
         return this.uploader;
     }

@@ -62,7 +62,6 @@ public class DevUI extends UI {
         mainLayout.addComponent(mgr2);
 
         final PluploadField<File> field = new PluploadField(File.class);
-        field.init();
         field.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 
             @Override
@@ -81,7 +80,6 @@ public class DevUI extends UI {
 
     private PluploadManager createUploadManager(final String name) {
         final PluploadManager mgr = new PluploadManager();
-        mgr.init();
         mgr.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 
             @Override

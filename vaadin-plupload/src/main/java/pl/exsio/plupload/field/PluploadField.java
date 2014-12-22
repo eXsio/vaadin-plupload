@@ -80,11 +80,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.postConstruct();
     }
 
-    public PluploadField init() {
-        this.uploader.init();
-        return this;
-    }
-
     @Override
     protected Component initContent() {
 

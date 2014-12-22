@@ -112,6 +112,7 @@ public class Plupload extends Button {
         this.handleFilesRemoved();
         this.handleFileUploaded();
         this.handleUploadComplete();
+        this.init();
     }
 
     private void handleUploadComplete() {
@@ -232,7 +233,7 @@ public class Plupload extends Button {
 
     };
 
-    public Plupload init() {
+    protected Plupload init() {
         if (!this.initialized) {
             this.getClient().init();
         }
