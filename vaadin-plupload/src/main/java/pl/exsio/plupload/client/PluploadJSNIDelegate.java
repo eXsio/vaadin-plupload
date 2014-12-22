@@ -36,7 +36,7 @@ public class PluploadJSNIDelegate {
         $wnd.uploaders = $wnd.uploaders || {};
         var uploader = new $wnd.plupload.Uploader({
             browse_button: button,
-            url: '',
+            url: 'pluploader-upload-action',
             max_file_size : '1000mb',
             chunk_size: '1mb',
             max_retries: 3,
@@ -44,8 +44,7 @@ public class PluploadJSNIDelegate {
             multi_selection: true,
             multipart: true
         });
-            
-        uploader.settings.url = 'pluploader-upload-action/'+uploader.id;     
+               
         uploader.disableBrowse(true);    
         uploader.bind('FilesAdded', function(up, files) {
             console.log('FILES ADDED');
@@ -87,7 +86,7 @@ public class PluploadJSNIDelegate {
         uploader.bind('BeforeUpload', function (up, file) {
             up.settings.multipart_params = {fileId: file.id}
         });
-            
+        uploader.init();    
         $wnd.uploaders[uploaderKey] = uploader;    
 
      }-*/;
@@ -153,17 +152,6 @@ public class PluploadJSNIDelegate {
             console.info(optionValue);
             $wnd.uploaders[uploaderKey].setOption(name, optionValue);
        }
-    }-*/;
-    
-    public static native void init(String uploaderKey, PluploadServerRpc rpc)
-    /*-{
-       $wnd.uploaders = $wnd.uploaders || {}; 
-       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
-            $wnd.uploaders[uploaderKey].init(); 
-            rpc.@pl.exsio.plupload.client.PluploadServerRpc::confirmInitialization(Ljava/lang/String;)($wnd.uploaders[uploaderKey].id);
-            $wnd.uploaders[uploaderKey].disableBrowse(false);  
-       }    
-            
     }-*/;
     
     public static native void removeFile(String uploaderKey, String fileId)

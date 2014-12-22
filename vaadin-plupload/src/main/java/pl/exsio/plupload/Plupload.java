@@ -28,14 +28,12 @@ import pl.exsio.plupload.helper.filter.PluploadFilters;
 import com.google.gson.Gson;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.Resource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.client.shared.PluploadState;
-import pl.exsio.plupload.ex.PluploadNotInitializedException;
 import pl.exsio.plupload.client.PluploadServerRpc;
 import pl.exsio.plupload.helper.resize.PluploadImageResize;
 
@@ -58,8 +56,6 @@ public class Plupload extends Button {
 
     protected final Set<FileUploadedListener> fileUploadedListeners = new LinkedHashSet<>();
 
-    protected final Set<InitListener> initListeners = new LinkedHashSet<>();
-
     protected final Set<ErrorListener> errorListeners = new LinkedHashSet<>();
 
     protected final Set<UploadStartListener> uploadStartListeners = new LinkedHashSet<>();
@@ -68,20 +64,14 @@ public class Plupload extends Button {
 
     protected final Set<UploadCompleteListener> uploadCompleteListeners = new LinkedHashSet<>();
 
-    protected boolean initialized = false;
-
     protected boolean uploadStarted = false;
-
-    protected transient PluploadReceiver receiver;
-
-    protected String uploaderId;
 
     protected final transient PluploadQueue queue = new PluploadQueue();
 
     protected final transient PluploadFilters filters = new PluploadFilters();
 
     protected PluploadImageResize imageResize = new PluploadImageResize();
-
+    
     public Plupload() {
         super();
         this.registerRpc(serverRpc);
@@ -108,11 +98,15 @@ public class Plupload extends Button {
 
     private void postConstruct() {
 
+        getReceiver().bind();
         this.handleFilesAdded();
         this.handleFilesRemoved();
         this.handleFileUploaded();
         this.handleUploadComplete();
-        this.init();
+    }
+    
+    protected static PluploadReceiver getReceiver() {
+        return PluploadReceiver.getInstance();
     }
 
     private void handleUploadComplete() {
@@ -130,7 +124,7 @@ public class Plupload extends Button {
 
             @Override
             public void onFileUploaded(PluploadFile file) {
-                File uploadedFile = receiver.getUploadedFile(file.getId());
+                File uploadedFile = getReceiver().retrieveUploadedFile(file.getId());
                 if (uploadedFile != null) {
                     queue.setUploadedFile(file.getId(), uploadedFile);
                     file.setUploadedFile(uploadedFile);
@@ -219,34 +213,9 @@ public class Plupload extends Button {
                 listener.onFileFiltered(file);
             }
         }
-
-        @Override
-        public void confirmInitialization(String remoteUploaderId) {
-            uploaderId = remoteUploaderId;
-            receiver = new PluploadReceiver(remoteUploaderId);
-            VaadinSession.getCurrent().addRequestHandler(receiver);
-            initialized = true;
-            for (InitListener listener : initListeners) {
-                listener.onInitialized(remoteUploaderId);
-            }
-        }
-
     };
 
-    protected Plupload init() {
-        if (!this.initialized) {
-            this.getClient().init();
-        }
-        return this;
-    }
 
-    public boolean isInitialized() {
-        return this.initialized;
-    }
-
-    public String getUploaderId() {
-        return this.uploaderId;
-    }
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -292,18 +261,16 @@ public class Plupload extends Button {
     }
 
     public Plupload start() {
-        if (this.initialized) {
-            if (!this.queue.isEmpty() && !this.uploadStarted) {
-                for (UploadStartListener listener : uploadStartListeners) {
-                    listener.onUploadStart();
-                }
-                this.getClient().start();
-                this.uploadStarted = true;
+
+        if (!this.queue.isEmpty() && !this.uploadStarted) {
+            for (UploadStartListener listener : uploadStartListeners) {
+                listener.onUploadStart();
             }
-            return this;
-        } else {
-            throw new PluploadNotInitializedException("You can't start the upload, because the uploader hasn't been initialized");
+            this.getClient().start();
+            this.uploadStarted = true;
         }
+        return this;
+
     }
 
     public PluploadFile[] getUploadedFiles() {
@@ -317,18 +284,15 @@ public class Plupload extends Button {
     }
 
     public Plupload stop() {
-        if (this.initialized) {
-            if (this.uploadStarted) {
-                this.getClient().stop();
-                for (UploadStopListener listener : this.uploadStopListeners) {
-                    listener.onUploadStop();
-                }
-                this.uploadStarted = false;
+
+        if (this.uploadStarted) {
+            this.getClient().stop();
+            for (UploadStopListener listener : this.uploadStopListeners) {
+                listener.onUploadStop();
             }
-            return this;
-        } else {
-            throw new PluploadNotInitializedException("You can't stop the upload, because the uploader hasn't been initialized");
+            this.uploadStarted = false;
         }
+        return this;
 
     }
 
@@ -381,11 +345,6 @@ public class Plupload extends Button {
         return this;
     }
 
-    public Plupload addInitListener(InitListener listener) {
-        this.initListeners.add(listener);
-        return this;
-    }
-
     public Plupload removeFilesAddedListener(FilesAddedListener listener) {
         this.filesAddedListeners.remove(listener);
         return this;
@@ -429,16 +388,6 @@ public class Plupload extends Button {
     public Plupload removeErrorListener(ErrorListener listener) {
         this.errorListeners.remove(listener);
         return this;
-    }
-
-    public Plupload removeInitListener(InitListener listener) {
-        this.initListeners.remove(listener);
-        return this;
-    }
-
-    public interface InitListener {
-
-        void onInitialized(String uploaderId);
     }
 
     public interface FilesAddedListener {

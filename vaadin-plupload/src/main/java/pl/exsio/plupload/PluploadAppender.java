@@ -73,14 +73,16 @@ public class PluploadAppender {
     }
 
     private static void saveChunkData(PluploadChunk chunk, FileItemStream item) throws IOException {
-        String uploadedFileName = getFileName(chunk);
-        InputStream input = item.openStream();
-        try (FileOutputStream output = new FileOutputStream(getFilePath(uploadedFileName), true)) {
-            copyInputStreamToOutputStream(input, output);
-            output.close();
+        if (PluploadReceiver.expectedFileIds.contains(chunk.getFileId())) {
+            String uploadedFileName = getFileName(chunk);
+            InputStream input = item.openStream();
+            try (FileOutputStream output = new FileOutputStream(getFilePath(uploadedFileName), true)) {
+                copyInputStreamToOutputStream(input, output);
+                output.close();
+            }
+            input.close();
+            chunk.setFile(new File(getFilePath(uploadedFileName)));
         }
-        input.close();
-        chunk.setFile(new File(getFilePath(uploadedFileName)));
     }
 
     private static void copyInputStreamToOutputStream(InputStream input, final FileOutputStream output) throws IOException {
@@ -89,6 +91,10 @@ public class PluploadAppender {
         while ((bytesRead = input.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);
         }
+    }
+    
+    protected static PluploadReceiver getReceiver() {
+        return PluploadReceiver.getInstance();
     }
 
     protected static String getFileName(PluploadChunk chunk) {

@@ -55,12 +55,14 @@ public class PluploadQueue {
     public void addFiles(PluploadFile[] files) {
         for (PluploadFile file : files) {
             this.addFile(file);
+            PluploadReceiver.expectedFileIds.add(file.getId());
         }
     }
 
     public void removeFile(String fileId) {
         if (this.queue.containsKey(fileId)) {
             this.queue.remove(fileId);
+            PluploadReceiver.expectedFileIds.add(fileId);
         }
     }
 

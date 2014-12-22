@@ -30,8 +30,11 @@ import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
@@ -43,23 +46,40 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 public class PluploadReceiver implements RequestHandler {
 
-    protected static final String UPLOAD_ACTION_PATH = "//pluploader-upload-action/";
+    private static class ReceiverHolder {
 
-    protected final String uploaderId;
+        private final static PluploadReceiver instance = new PluploadReceiver();
+    }
+
+    protected static PluploadReceiver getInstance() {
+        return ReceiverHolder.instance;
+    }
+
+    protected static final Set<String> expectedFileIds = Collections.synchronizedSet(new HashSet());
+
+    protected static final String UPLOAD_ACTION_PATH = "//pluploader-upload-action";
 
     protected final String uploadActionPath;
 
     protected final Map<String, File> uploadedFiles;
 
-    public PluploadReceiver(String uploaderId) {
-        this.uploaderId = uploaderId;
-        this.uploadActionPath = UPLOAD_ACTION_PATH + uploaderId;
+    private PluploadReceiver() {
+        this.uploadActionPath = UPLOAD_ACTION_PATH;
         this.uploadedFiles = new HashMap<>();
     }
 
-    public File getUploadedFile(String fileId) {
+    public void bind() {
+        VaadinSession session = VaadinSession.getCurrent();
+        if (!session.getRequestHandlers().contains(getInstance())) {
+            session.addRequestHandler(getInstance());
+        }
+    }
+
+    public File retrieveUploadedFile(String fileId) {
         if (this.uploadedFiles.containsKey(fileId)) {
-            return this.uploadedFiles.get(fileId);
+            File file = this.uploadedFiles.get(fileId);
+            this.uploadedFiles.remove(fileId);
+            return file;
         } else {
             return null;
         }

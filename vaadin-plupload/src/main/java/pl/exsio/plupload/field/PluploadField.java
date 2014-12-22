@@ -76,7 +76,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.returnTypeClass = returnTypeClass;
         this.uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
         this.uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
-        this.uploader.disableBrowse(true);
         this.postConstruct();
     }
 
@@ -121,7 +120,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
         this.handleFilesAdded();
         this.handleFilesRemoved();
-        this.handleUploaderInitialized();
         this.handleUploadProgress();
         this.handleFileUploaded();
 
@@ -153,16 +151,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             public void onUploadProgress(PluploadFile file) {
                 progressBar.setValue(new Long(file.getPercent()).floatValue() / 100);
                 progressBar.setDescription(file.getPercent() + "%");
-            }
-        });
-    }
-
-    private void handleUploaderInitialized() {
-        this.uploader.addInitListener(new Plupload.InitListener() {
-
-            @Override
-            public void onInitialized(String uploaderId) {
-                uploader.disableBrowse(false);
             }
         });
     }
