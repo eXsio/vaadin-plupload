@@ -106,13 +106,12 @@ public class PluploadReceiver implements RequestHandler {
                         response.getWriter().append("file upload unsuccessful");
                         throw new IOException(ex);
                     }
+                    return true;
                 }
             }
-
-            return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 
     private PluploadProgress getProgress(PluploadChunk chunk) {

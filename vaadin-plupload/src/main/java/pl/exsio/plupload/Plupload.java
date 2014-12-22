@@ -27,6 +27,7 @@ import pl.exsio.plupload.helper.filter.PluploadFilter;
 import pl.exsio.plupload.helper.filter.PluploadFilters;
 import com.google.gson.Gson;
 import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import java.io.File;
@@ -63,9 +64,13 @@ public class Plupload extends Button {
 
     protected final Set<UploadStartListener> uploadStartListeners = new LinkedHashSet<>();
 
+    protected final Set<UploadStopListener> uploadStopListeners = new LinkedHashSet<>();
+
     protected final Set<UploadCompleteListener> uploadCompleteListeners = new LinkedHashSet<>();
 
     protected boolean initialized = false;
+
+    protected boolean uploadStarted = false;
 
     protected transient PluploadReceiver receiver;
 
@@ -95,6 +100,12 @@ public class Plupload extends Button {
         this.postConstruct();
     }
 
+    public Plupload(String caption, Resource icon) {
+        super(caption, icon);
+        this.registerRpc(serverRpc);
+        this.postConstruct();
+    }
+
     private void postConstruct() {
 
         this.addFilesAddedListener(new FilesAddedListener() {
@@ -119,6 +130,14 @@ public class Plupload extends Button {
                 if (uploadedFile != null) {
                     queue.setUploadedFile(file.getId(), uploadedFile);
                 }
+            }
+        });
+
+        this.addUploadCompleteListener(new UploadCompleteListener() {
+
+            @Override
+            public void onUploadComplete() {
+                uploadStarted = false;
             }
         });
     }
@@ -197,10 +216,11 @@ public class Plupload extends Button {
 
     };
 
-    public void init() {
+    public Plupload init() {
         if (!this.initialized) {
             this.getClient().init();
         }
+        return this;
     }
 
     public boolean isInitialized() {
@@ -217,45 +237,53 @@ public class Plupload extends Button {
         this.disableBrowse(!enabled);
     }
 
-    public void disableBrowse(boolean disable) {
+    public Plupload disableBrowse(boolean disable) {
         this.getClient().disableBrowse(disable);
+        return this;
     }
 
-    public void setOption(PluploadOption name, String value) {
+    public Plupload setOption(PluploadOption name, String value) {
         this.getClient().setOption(name.toString(), value);
+        return this;
     }
 
-    public void removeFile(String fileId) {
+    public Plupload removeFile(String fileId) {
         this.getClient().removeFile(fileId);
+        return this;
     }
 
-    public void addFilter(PluploadFilter filter) {
+    public Plupload addFilter(PluploadFilter filter) {
         this.filters.addMimeType(filter);
         this.setOption(PluploadOption.FILTERS, new Gson().toJson(this.filters));
+        return this;
     }
 
-    public void removeFilter(PluploadFilter filter) {
+    public Plupload removeFilter(PluploadFilter filter) {
         this.filters.removeMimeType(filter);
         this.setOption(PluploadOption.FILTERS, new Gson().toJson(this.filters));
+        return this;
     }
 
     public PluploadImageResize getImageResize() {
         return this.imageResize;
     }
 
-    public void setImageResize(PluploadImageResize resize) {
+    public Plupload setImageResize(PluploadImageResize resize) {
         this.imageResize = resize;
         this.setOption(PluploadOption.RESIZE, new Gson().toJson(this.imageResize));
+        return this;
     }
 
-    public void start() throws PluploadNotInitializedException {
+    public Plupload start() {
         if (this.initialized) {
-            if (!this.queue.isEmpty()) {
+            if (!this.queue.isEmpty() && !this.uploadStarted) {
                 for (UploadStartListener listener : uploadStartListeners) {
                     listener.onUploadStart();
                 }
                 this.getClient().start();
+                this.uploadStarted = true;
             }
+            return this;
         } else {
             throw new PluploadNotInitializedException("You can't start the upload, because the uploader hasn't been initialized");
         }
@@ -269,84 +297,124 @@ public class Plupload extends Button {
         return this.queue.getPluploadFiles(PluploadQueue.Mode.NOT_UPLOADED);
     }
 
-    public void stop() {
-        this.getClient().stop();
+    public Plupload stop() {
+        if (this.initialized) {
+            if (this.uploadStarted) {
+                this.getClient().stop();
+                for (UploadStopListener listener : this.uploadStopListeners) {
+                    listener.onUploadStop();
+                }
+                this.uploadStarted = false;
+            }
+            return this;
+        } else {
+            throw new PluploadNotInitializedException("You can't stop the upload, because the uploader hasn't been initialized");
+        }
+
     }
 
     protected PluploadCilentRpc getClient() {
         return this.getRpcProxy(PluploadCilentRpc.class);
     }
 
-    public void addFilesAddedListener(FilesAddedListener listener) {
+    public Plupload addFilesAddedListener(FilesAddedListener listener) {
         this.filesAddedListeners.add(listener);
+        return this;
     }
 
-    public void addFilesRemovedListener(FilesRemovedListener listener) {
+    public Plupload addFilesRemovedListener(FilesRemovedListener listener) {
         this.filesRemovedListeners.add(listener);
+        return this;
     }
 
-    public void addFileFilteredListener(FileFilteredListener listener) {
+    public Plupload addFileFilteredListener(FileFilteredListener listener) {
         this.fileFilteredListeners.add(listener);
+        return this;
     }
 
-    public void addFileUploadedListener(FileUploadedListener listener) {
+    public Plupload addFileUploadedListener(FileUploadedListener listener) {
         this.fileUploadedListeners.add(listener);
+        return this;
     }
 
-    public void addUploadProgressListener(UploadProgressListener listener) {
+    public Plupload addUploadProgressListener(UploadProgressListener listener) {
         this.uploadProgressListeners.add(listener);
+        return this;
     }
 
-    public void addUploadStartListener(UploadStartListener listener) {
+    public Plupload addUploadStartListener(UploadStartListener listener) {
         this.uploadStartListeners.add(listener);
+        return this;
     }
 
-    public void addUploadCompleteListener(UploadCompleteListener listener) {
+    public Plupload addUploadStopListener(UploadStopListener listener) {
+        this.uploadStopListeners.add(listener);
+        return this;
+    }
+
+    public Plupload addUploadCompleteListener(UploadCompleteListener listener) {
         this.uploadCompleteListeners.add(listener);
+        return this;
     }
 
-    public void addErrorListener(ErrorListener listener) {
+    public Plupload addErrorListener(ErrorListener listener) {
         this.errorListeners.add(listener);
+        return this;
     }
 
-    public void addInitListener(InitListener listener) {
+    public Plupload addInitListener(InitListener listener) {
         this.initListeners.add(listener);
+        return this;
     }
 
-    public void removeFilesAddedListener(FilesAddedListener listener) {
+    public Plupload removeFilesAddedListener(FilesAddedListener listener) {
         this.filesAddedListeners.remove(listener);
+        return this;
     }
 
-    public void removeFilesRemovedListener(FilesRemovedListener listener) {
+    public Plupload removeFilesRemovedListener(FilesRemovedListener listener) {
         this.filesRemovedListeners.remove(listener);
+        return this;
     }
 
-    public void removeFileFilteredListener(FileFilteredListener listener) {
+    public Plupload removeFileFilteredListener(FileFilteredListener listener) {
         this.fileFilteredListeners.remove(listener);
+        return this;
     }
 
-    public void removeFileUploadedListener(FileUploadedListener listener) {
+    public Plupload removeFileUploadedListener(FileUploadedListener listener) {
         this.fileUploadedListeners.remove(listener);
+        return this;
     }
 
-    public void removeUploadProgressListener(UploadProgressListener listener) {
+    public Plupload removeUploadProgressListener(UploadProgressListener listener) {
         this.uploadProgressListeners.remove(listener);
+        return this;
     }
 
-    public void removeUploadStartListener(UploadStartListener listener) {
+    public Plupload removeUploadStartListener(UploadStartListener listener) {
         this.uploadStartListeners.remove(listener);
+        return this;
     }
 
-    public void removeUploadCompleteListener(UploadCompleteListener listener) {
+    public Plupload removeUploadStopListener(UploadStopListener listener) {
+        this.uploadStopListeners.remove(listener);
+        return this;
+    }
+
+    public Plupload removeUploadCompleteListener(UploadCompleteListener listener) {
         this.uploadCompleteListeners.remove(listener);
+        return this;
     }
 
-    public void removeErrorListener(ErrorListener listener) {
+    public Plupload removeErrorListener(ErrorListener listener) {
         this.errorListeners.remove(listener);
+        return this;
     }
 
-    public void removeInitListener(InitListener listener) {
+    public Plupload removeInitListener(InitListener listener) {
         this.initListeners.remove(listener);
+        return this;
     }
 
     public interface InitListener {
@@ -382,6 +450,11 @@ public class Plupload extends Button {
     public interface UploadProgressListener {
 
         void onUploadProgress(PluploadFile file);
+    }
+
+    public interface UploadStopListener {
+
+        void onUploadStop();
     }
 
     public interface UploadCompleteListener {

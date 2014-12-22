@@ -27,7 +27,7 @@ package pl.exsio.plupload.ex;
  *
  * @author exsio
  */
-public class PluploadNotInitializedException extends Exception {
+public class PluploadNotInitializedException extends RuntimeException {
 
     public PluploadNotInitializedException(String msg) {
         super(msg);

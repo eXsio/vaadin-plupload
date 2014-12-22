@@ -37,7 +37,7 @@ public enum PluploadOption {
     MULTI_SELECTION("multi_selection"),
     PREVENT_DUPLICATES("prevent_duplicates");
 
-    private String optionName;
+    private final String optionName;
 
     private PluploadOption(String optionName) {
         this.optionName = optionName;

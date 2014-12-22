@@ -34,8 +34,7 @@ import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadOption;
 import pl.exsio.plupload.ex.PluploadNotInitializedException;
 import pl.exsio.plupload.PluploadFile;
-import pl.exsio.plupload.helper.filter.PluploadFilter;
-import pl.exsio.plupload.helper.resize.PluploadImageResize;
+import pl.exsio.plupload.manager.PluploadManager;
 
 @SuppressWarnings("serial")
 public class DevUI extends UI {
@@ -45,137 +44,36 @@ public class DevUI extends UI {
     public static class DevServlet extends VaadinServlet {
     }
 
-    private final Map<String, Button> removeButtons = new HashMap();
-
-    private final Map<String, ProgressBar> progressBars = new HashMap();
-
-    private final Map<String, Label> progressLabels = new HashMap();
-
-    private final Map<String, Layout> controls = new HashMap();
-
     @Override
     protected void init(VaadinRequest request) {
 
-        final Plupload uploader = new Plupload();
         final VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSpacing(true);
         mainLayout.setMargin(true);
-        uploader.setImmediate(true);
-        uploader.setCaption("Browse");
 
-        uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
+        PluploadManager mgr = createUploadManager("Manager 1");
+        PluploadManager mgr2 = createUploadManager("Manager 2");
 
-            @Override
-            public void onFilesAdded(PluploadFile[] files) {
+        mainLayout.addComponent(mgr);
+        mainLayout.addComponent(mgr2);
+        this.setContent(mainLayout);
 
-                for (final PluploadFile file : files) {
-                    System.out.println(file.toString());
-                    HorizontalLayout layout = new HorizontalLayout();
-                    final ProgressBar progress = new ProgressBar();
-                    progress.setIndeterminate(false);
-                    progress.setValue(0f);
-                    progress.setWidth("200px");
-                    Button remove = new Button("X");
-                    Label nameLabel = new Label(file.getName());
-                    Label progressLabel = new Label("0%");
-                    remove.addClickListener(new Button.ClickListener() {
+    }
 
-                        @Override
-                        public void buttonClick(Button.ClickEvent event) {
-                            uploader.removeFile(file.getId());
-                        }
-                    });
-
-                    removeButtons.put(file.getId(), remove);
-                    progressBars.put(file.getId(), progress);
-                    progressLabels.put(file.getId(), progressLabel);
-                    layout.addComponent(nameLabel);
-                    layout.addComponent(progress);
-                    layout.addComponent(progressLabel);
-                    layout.addComponent(remove);
-                    mainLayout.addComponent(layout);
-                    controls.put(file.getId(), layout);
-                }
-            }
-        });
-        final Button start = new Button("Start");
-        start.setEnabled(false);
-        uploader.addInitListener(new Plupload.InitListener() {
-
-            @Override
-            public void onInitialized(String uploaderId) {
-                System.out.println("Initialized uploader: " + uploaderId);
-                start.setEnabled(true);
-            }
-        });
-
-        uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
-
-            @Override
-            public void onUploadProgress(PluploadFile file) {
-                progressLabels.get(file.getId()).setValue(file.getPercent() + "%");
-                System.out.println(file.getPercent() + "%");
-                progressBars.get(file.getId()).setValue(new Long(file.getPercent()).floatValue() / 100);
-            }
-        });
-
-        uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
+    private PluploadManager createUploadManager(final String name) {
+        final PluploadManager mgr = new PluploadManager();
+        mgr.init();
+        mgr.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 
             @Override
             public void onUploadComplete() {
-                System.out.println("upload complete");
-                for (PluploadFile f : uploader.getUploadedFiles()) {
-                    System.out.println(f.getUploadedFile().getAbsolutePath());
+                System.out.println("Files uploaded by " + name + ": ");
+                for (PluploadFile file : mgr.getUploadedFiles()) {
+                    System.out.println(file.getUploadedFile().getAbsolutePath());
                 }
             }
         });
-
-        uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
-
-            @Override
-            public void onFilesRemoved(PluploadFile[] files) {
-                for (PluploadFile file : files) {
-                    mainLayout.removeComponent(controls.get(file.getId()));
-                }
-            }
-        });
-
-        start.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-                try {
-                    uploader.start();
-                } catch (PluploadNotInitializedException ex) {
-                    Notification.show("Nie udało się wystartować!");
-                    ex.printStackTrace();
-                }
-            }
-        });
-
-        Button stop = new Button("Stop");
-        stop.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                uploader.stop();
-            }
-        });
-
-        mainLayout.addComponent(uploader);
-        mainLayout.addComponent(start);
-        mainLayout.addComponent(stop);
-        this.setContent(mainLayout);
-
-        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
-        uploader.setOption(PluploadOption.MAX_RETRIES, "5");
-        uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
-        uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
-        uploader.addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
-        uploader.setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setWidth(200).setHeight(100));
-        uploader.init();
-
+        return mgr;
     }
 
 }

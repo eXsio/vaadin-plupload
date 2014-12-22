@@ -1,0 +1,338 @@
+package pl.exsio.plupload.manager;
+
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.VerticalLayout;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import pl.exsio.plupload.Plupload;
+import pl.exsio.plupload.PluploadFile;
+import static pl.exsio.plupload.util.PluploadUtil.trimTextInTheMiddle;
+
+/**
+ *
+ * @author exsio
+ */
+public class PluploadManager extends VerticalLayout {
+
+    protected final HorizontalLayout controls;
+
+    protected final VerticalLayout itemsContainer;
+
+    protected final Map<String, Item> itemsMap;
+
+    protected String browseLabel = "Browse";
+
+    protected String startLabel = "Start";
+
+    protected String stopLabel = "Stop";
+
+    protected String removeLabel = "";
+
+    protected Plupload uploader;
+
+    protected Button startButton;
+
+    protected Button stopButton;
+
+    protected final Set<ItemCreationListener> itemCreationListeners = new LinkedHashSet<>();
+
+    public PluploadManager() {
+        this.controls = new HorizontalLayout();
+
+        this.itemsContainer = new VerticalLayout();
+        this.itemsMap = new LinkedHashMap();
+        this.initManager();
+        this.initControls();
+        this.initItems();
+        this.initListeners();
+    }
+
+    private void initManager() {
+        this.setSpacing(true);
+        this.setMargin(true);
+        this.setStyleName("plupload-mgr");
+    }
+
+    private void initControls() {
+        this.controls.setSpacing(true);
+        this.controls.setStyleName("plupload-mgr-controls");
+        uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
+        startButton = new Button(this.startLabel, FontAwesome.PLAY);
+        stopButton = new Button(this.stopLabel, FontAwesome.STOP);
+        startButton.setEnabled(false);
+        stopButton.setEnabled(false);
+        this.controls.addComponent(uploader);
+        this.controls.addComponent(startButton);
+        this.controls.addComponent(stopButton);
+
+        this.addComponent(this.controls);
+    }
+
+    private void initItems() {
+        this.itemsContainer.setSpacing(true);
+        this.itemsContainer.setStyleName("plupload-mgr-items");
+        this.addComponent(this.itemsContainer);
+
+    }
+
+    public PluploadManager init() {
+        this.uploader.init();
+        return this;
+    }
+
+    public Plupload getUploader() {
+        return this.uploader;
+    }
+
+    public PluploadManager setStartButtonCaption(String caption) {
+        this.startButton.setCaption(caption);
+        return this;
+    }
+
+    public PluploadManager setBrowseButtonCaption(String caption) {
+        this.uploader.setCaption(caption);
+        return this;
+    }
+
+    public PluploadManager setStopButtonCaption(String caption) {
+        this.stopButton.setCaption(caption);
+        return this;
+    }
+
+    public PluploadManager setRemoveButtonCaption(String caption) {
+        this.removeLabel = caption;
+        for (String fileId : this.itemsMap.keySet()) {
+            this.itemsMap.get(fileId).getRemoveButton().setCaption(caption);
+        }
+        return this;
+    }
+
+    public Set<PluploadFile> getUploadedFiles() {
+        return this.uploader.getUploadedFiles();
+    }
+
+    public HorizontalLayout getControls() {
+        return this.controls;
+    }
+
+    public VerticalLayout getItemsContainer() {
+        return this.itemsContainer;
+    }
+
+    public Map<String, Item> getItemsMap() {
+        return this.itemsMap;
+    }
+
+    public Button getStartButton() {
+        return this.startButton;
+    }
+
+    public Button getStopButton() {
+        return this.stopButton;
+    }
+
+    public PluploadManager addItemCreationListener(ItemCreationListener listener) {
+        this.itemCreationListeners.add(listener);
+        return this;
+    }
+
+    public PluploadManager removeItemCreationListener(ItemCreationListener listener) {
+        this.itemCreationListeners.remove(listener);
+        return this;
+    }
+
+    private void initListeners() {
+        this.uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
+
+            @Override
+            public void onFilesAdded(PluploadFile[] files) {
+
+                for (PluploadFile file : files) {
+                    Item item = new Item(file);
+                    for (ItemCreationListener listener : itemCreationListeners) {
+                        listener.onCreateItem(item);
+                    }
+                    addItem(file.getId(), item);
+                }
+                if (!uploader.getQueuedFiles().isEmpty()) {
+                    startButton.setEnabled(true);
+                }
+            }
+        });
+
+        this.uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
+
+            @Override
+            public void onFilesRemoved(PluploadFile[] files) {
+                for (PluploadFile file : files) {
+                    removeItem(file.getId());
+                }
+            }
+        });
+        this.uploader.addUploadStartListener(new Plupload.UploadStartListener() {
+
+            @Override
+            public void onUploadStart() {
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+            }
+        });
+
+        this.uploader.addUploadStopListener(new Plupload.UploadStopListener() {
+
+            @Override
+            public void onUploadStop() {
+                startButton.setEnabled(true);
+                stopButton.setEnabled(false);
+            }
+        });
+
+        this.uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
+
+            @Override
+            public void onUploadProgress(PluploadFile file) {
+                if (itemsMap.containsKey(file.getId())) {
+                    itemsMap.get(file.getId()).setProgress(file.getPercent());
+                }
+            }
+        });
+
+        this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
+
+            @Override
+            public void onFileUploaded(PluploadFile file) {
+                if (itemsMap.containsKey(file.getId())) {
+                    itemsMap.get(file.getId()).setUploaded();
+                }
+            }
+        });
+
+        this.uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
+
+            @Override
+            public void onUploadComplete() {
+                if (uploader.getQueuedFiles().isEmpty()) {
+                    startButton.setEnabled(false);
+                }
+                stopButton.setEnabled(false);
+            }
+        });
+
+        this.startButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                uploader.start();
+            }
+        });
+
+        this.stopButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                uploader.stop();
+            }
+        });
+    }
+
+    protected void addItem(String fileId, Item item) {
+        this.itemsMap.put(fileId, item);
+        this.itemsContainer.addComponent(item);
+    }
+
+    protected void removeItem(String fileId) {
+        if (this.itemsMap.containsKey(fileId)) {
+            this.itemsContainer.removeComponent(this.itemsMap.get(fileId));
+            this.itemsMap.remove(fileId);
+        }
+    }
+
+    public interface ItemCreationListener {
+
+        void onCreateItem(Item item);
+
+    }
+
+    public class Item extends HorizontalLayout {
+
+        protected ProgressBar progressBar;
+
+        protected Label nameLabel;
+
+        protected Label percentLabel;
+
+        protected Button removeButton;
+
+        public Item(final PluploadFile file) {
+            this.progressBar = new ProgressBar();
+            this.progressBar.setIndeterminate(false);
+            this.progressBar.setValue(0f);
+            this.progressBar.setWidth("270px");
+
+            this.setWidth("350px");
+            this.setStyleName("plupload-mgr-item plupload-mgr-item-" + file.getId());
+
+            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 25));
+            this.nameLabel.setDescription(file.getName());
+            this.percentLabel = new Label("0%");
+
+            this.removeButton = new Button(removeLabel, FontAwesome.TIMES);
+            this.removeButton.addClickListener(new Button.ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    uploader.removeFile(file.getId());
+                }
+            });
+
+            VerticalLayout vlayout = new VerticalLayout();
+            vlayout.setSpacing(true);
+            vlayout.addComponent(this.nameLabel);
+            HorizontalLayout hlayout = new HorizontalLayout();
+            hlayout.setSpacing(true);
+            hlayout.addComponent(this.progressBar);
+            hlayout.addComponent(this.percentLabel);
+
+            vlayout.addComponent(hlayout);
+
+            this.addComponent(vlayout);
+            this.addComponent(this.removeButton);
+            this.setComponentAlignment(this.removeButton, Alignment.MIDDLE_RIGHT);
+
+        }
+
+        public void setProgress(long percent) {
+            this.progressBar.setValue(new Long(percent).floatValue() / 100);
+            this.percentLabel.setValue(percent + "%");
+        }
+
+        public void setUploaded() {
+            this.percentLabel.setValue("");
+            this.percentLabel.setIcon(FontAwesome.CHECK);
+        }
+
+        public ProgressBar getProgressBar() {
+            return progressBar;
+        }
+
+        public Label getNameLabel() {
+            return nameLabel;
+        }
+
+        public Label getPercentLabel() {
+            return percentLabel;
+        }
+
+        public Button getRemoveButton() {
+            return removeButton;
+        }
+
+    }
+}
