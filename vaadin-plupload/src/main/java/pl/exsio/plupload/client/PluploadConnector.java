@@ -38,8 +38,10 @@ import pl.exsio.plupload.Plupload;
 public class PluploadConnector extends ButtonConnector {
 
     protected PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
-    
-    protected final String uploaderKey = ""+(new Random().nextInt(Integer.MAX_VALUE))+(new Random().nextInt(Integer.MAX_VALUE))+(new Random().nextInt(Integer.MAX_VALUE));
+
+    protected final String uploaderKey = "" + (new Random().nextInt(Integer.MAX_VALUE))
+            + (new Random().nextInt(Integer.MAX_VALUE))
+            + (new Random().nextInt(Integer.MAX_VALUE));
 
     public PluploadConnector() {
         super();
