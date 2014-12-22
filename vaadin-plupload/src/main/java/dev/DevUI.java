@@ -32,12 +32,14 @@ import javax.servlet.annotation.WebServlet;
 import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.field.PluploadField;
+import pl.exsio.plupload.helper.filter.PluploadFilter;
+import pl.exsio.plupload.helper.resize.PluploadImageResize;
 import pl.exsio.plupload.manager.PluploadManager;
 
 @SuppressWarnings("serial")
 public class DevUI extends UI {
 
-    @WebServlet(value = "/*", asyncSupported = true)
+    @WebServlet(value = "/*", asyncSupported = false)
     @VaadinServletConfiguration(productionMode = false, ui = DevUI.class, widgetset = "pl.exsio.plupload.PluploadWidgetSet")
     public static class DevServlet extends VaadinServlet {
     }
@@ -51,6 +53,10 @@ public class DevUI extends UI {
 
         PluploadManager mgr = createUploadManager("Manager 1");
         PluploadManager mgr2 = createUploadManager("Manager 2");
+
+        mgr.getUploader().addFilter(new PluploadFilter("music", "mp3, flac"));
+        mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
+        mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
 
         mainLayout.addComponent(mgr);
         mainLayout.addComponent(mgr2);
@@ -84,6 +90,13 @@ public class DevUI extends UI {
                 for (PluploadFile file : mgr.getUploadedFiles()) {
                     System.out.println(file.getUploadedFile().getAbsolutePath());
                 }
+            }
+        });
+        mgr.getUploader().addFileFilteredListener(new Plupload.FileFilteredListener() {
+
+            @Override
+            public void onFileFiltered(PluploadFile file) {
+                System.out.println("This file was filtered: " + file.getName());
             }
         });
         return mgr;
