@@ -278,7 +278,7 @@ public class PluploadManager extends VerticalLayout {
                 for (PluploadFile file : files) {
                     Item item = new Item(file);
                     for (ItemCreationListener listener : itemCreationListeners) {
-                        listener.onCreateItem(item);
+                        listener.onCreateItem(item, file);
                     }
                     addItem(file.getId(), item);
                 }
@@ -303,7 +303,7 @@ public class PluploadManager extends VerticalLayout {
 
     public interface ItemCreationListener {
 
-        void onCreateItem(Item item);
+        void onCreateItem(Item item, PluploadFile file);
 
     }
 
@@ -326,8 +326,10 @@ public class PluploadManager extends VerticalLayout {
             this.setWidth("350px");
             this.setStyleName("plupload-mgr-item plupload-mgr-item-" + file.getId());
 
-            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 25));
+            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 45));
+            this.nameLabel.setWidth("270px");
             this.nameLabel.setDescription(file.getName());
+
             this.percentLabel = new Label("0%");
 
             this.removeButton = new Button(removeLabel, FontAwesome.TIMES);
