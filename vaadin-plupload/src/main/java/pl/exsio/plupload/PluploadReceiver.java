@@ -31,16 +31,11 @@ import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.FileCleanerCleanup;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileCleaningTracker;
 
 /**
  *
@@ -50,27 +45,16 @@ public class PluploadReceiver implements RequestHandler {
 
     protected static final String UPLOAD_ACTION_PATH = "//pluploader-upload-action/";
 
-    private static final String CACHE_PATH = System.getProperty("java.io.tmpdir") + File.separator;
-
-    private static final int CACHE_SIZE = (int) Math.pow(10, 6);
-
-    private static final int MAX_REQUEST_SIZE = 1000 * (int) Math.pow(10, 6);
-
-    private static final int MAX_FILE_SIZE = 1000 * (int) Math.pow(10, 6);
-
     protected final String uploaderId;
 
     protected final String uploadActionPath;
 
     protected final Map<String, File> uploadedFiles;
 
-    protected final Map<String, PluploadProgress> progressMap;
-
     public PluploadReceiver(String uploaderId) {
         this.uploaderId = uploaderId;
         this.uploadActionPath = UPLOAD_ACTION_PATH + uploaderId;
         this.uploadedFiles = new HashMap<>();
-        this.progressMap = new HashMap<>();
     }
 
     public File getUploadedFile(String fileId) {
@@ -91,14 +75,12 @@ public class PluploadReceiver implements RequestHandler {
                 if (ServletFileUpload.isMultipartContent(req)) {
                     try {
 
-                        ServletFileUpload upload = this.createServletFileUpload(req);
-                        List<FileItem> items = upload.parseRequest(req);
-                        PluploadChunk chunk = this.createChunk(items);
-                        PluploadProgress progress = this.getProgress(chunk);
+                        ServletFileUpload upload = new ServletFileUpload();
+                        FileItemIterator items = upload.getItemIterator(req);
+                        PluploadChunk chunk = PluploadAppender.appendData(items);
 
-                        if (progress.appendChunk(chunk)) {
-                            this.uploadedFiles.put(chunk.getFileId(), progress.getUploadedFile());
-                            this.progressMap.remove(chunk.getFileId());
+                        if (chunk.isLast()) {
+                            this.uploadedFiles.put(chunk.getFileId(), chunk.getFile());
                             response.getWriter().append("file " + chunk.getName() + " uploaded successfuly");
                         } else {
                             response.getWriter().append("file chunk " + (chunk.getChunk() + 1) + " of " + chunk.getChunks() + " uploaded successfuly");
@@ -114,57 +96,6 @@ public class PluploadReceiver implements RequestHandler {
         }
         return false;
 
-    }
-
-    private PluploadProgress getProgress(PluploadChunk chunk) {
-        PluploadProgress progress = null;
-        if (!this.progressMap.containsKey(chunk.getFileId())) {
-            progress = new PluploadProgress();
-            this.progressMap.put(chunk.getFileId(), progress);
-        } else {
-            progress = this.progressMap.get(chunk.getFileId());
-        }
-        return progress;
-    }
-
-    private PluploadChunk createChunk(List<FileItem> items) throws NumberFormatException {
-        PluploadChunk chunk = new PluploadChunk();
-        Iterator iter = items.iterator();
-        while (iter.hasNext()) {
-            FileItem item = (FileItem) iter.next();
-
-            if (item.isFormField()) {
-                switch (item.getFieldName()) {
-                    case "fileId":
-                        chunk.setFileId(item.getString());
-                        break;
-                    case "name":
-                        chunk.setName(item.getString());
-                        break;
-                    case "chunk":
-                        chunk.setChunk(Integer.parseInt(item.getString()));
-                        break;
-                    case "chunks":
-                        chunk.setChunks(Integer.parseInt(item.getString()));
-                }
-
-            } else {
-                chunk.setData(item);
-            }
-        }
-        return chunk;
-    }
-
-    private ServletFileUpload createServletFileUpload(HttpServletRequest req) {
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        factory.setRepository(new File(CACHE_PATH));
-        factory.setSizeThreshold(CACHE_SIZE);
-        FileCleaningTracker fileCleaningTracker = FileCleanerCleanup.getFileCleaningTracker(req.getServletContext());
-        factory.setFileCleaningTracker(fileCleaningTracker);
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        upload.setSizeMax(MAX_REQUEST_SIZE);
-        upload.setFileSizeMax(MAX_FILE_SIZE);
-        return upload;
     }
 
 }

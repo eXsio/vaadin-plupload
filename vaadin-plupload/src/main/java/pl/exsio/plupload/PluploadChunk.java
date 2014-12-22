@@ -23,7 +23,7 @@
  */
 package pl.exsio.plupload;
 
-import org.apache.commons.fileupload.FileItem;
+import java.io.File;
 
 /**
  *
@@ -39,7 +39,7 @@ public class PluploadChunk {
 
     protected int chunks;
 
-    protected FileItem data;
+    protected File file;
 
     public String getFileId() {
         return fileId;
@@ -77,13 +77,16 @@ public class PluploadChunk {
         return this;
     }
 
-    public FileItem getData() {
-        return data;
+    public void setFile(File file) {
+        this.file = file;
     }
 
-    public PluploadChunk setData(FileItem data) {
-        this.data = data;
-        return this;
+    public File getFile() {
+        return file;
+    }
+
+    public boolean isLast() {
+        return this.chunk + 1 == this.chunks;
     }
 
 }

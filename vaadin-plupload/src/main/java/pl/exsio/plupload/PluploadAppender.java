@@ -1,0 +1,95 @@
+/* 
+ * The MIT License
+ *
+ * Copyright 2014 exsio.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package pl.exsio.plupload;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.util.Streams;
+
+/**
+ *
+ * @author exsio
+ */
+public class PluploadAppender {
+
+    protected static final String path = System.getProperty("java.io.tmpdir");
+
+    public static PluploadChunk appendData(FileItemIterator items) throws IOException, FileUploadException {
+        PluploadChunk chunk = new PluploadChunk();
+        while (items.hasNext()) {
+            FileItemStream item = (FileItemStream) items.next();
+
+            if (item.isFormField()) {
+                String value = Streams.asString(item.openStream());
+                switch (item.getFieldName()) {
+                    case "fileId":
+                        chunk.setFileId(value);
+                        break;
+                    case "name":
+                        chunk.setName(value);
+                        break;
+                    case "chunk":
+                        chunk.setChunk(Integer.parseInt(value));
+                        break;
+                    case "chunks":
+                        chunk.setChunks(Integer.parseInt(value));
+                }
+
+            } else {
+                String uploadedFileName = getFileName(chunk);
+                InputStream input = item.openStream();
+                try (FileOutputStream output = new FileOutputStream(getFilePath(uploadedFileName), true)) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, bytesRead);
+                    }
+                    output.close();
+                }
+                input.close();
+                chunk.setFile(new File(getFilePath(uploadedFileName)));
+            }
+        }
+
+        return chunk;
+    }
+
+    protected static String getFileName(PluploadChunk chunk) {
+        String[] arr = chunk.getName().split("\\.");
+        StringBuilder name = new StringBuilder(chunk.getFileId());
+        if (arr.length > 1) {
+            name.append(".").append(arr[arr.length - 1]);
+        }
+        return name.toString();
+    }
+
+    protected static String getFilePath(String uploadedFileName) {
+        return path + File.separator + uploadedFileName;
+    }
+}
