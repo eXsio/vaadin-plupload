@@ -46,38 +46,49 @@ public class PluploadAppender {
             FileItemStream item = (FileItemStream) items.next();
 
             if (item.isFormField()) {
-                String value = Streams.asString(item.openStream());
-                switch (item.getFieldName()) {
-                    case "fileId":
-                        chunk.setFileId(value);
-                        break;
-                    case "name":
-                        chunk.setName(value);
-                        break;
-                    case "chunk":
-                        chunk.setChunk(Integer.parseInt(value));
-                        break;
-                    case "chunks":
-                        chunk.setChunks(Integer.parseInt(value));
-                }
-
+                setChunkField(chunk, item);
             } else {
-                String uploadedFileName = getFileName(chunk);
-                InputStream input = item.openStream();
-                try (FileOutputStream output = new FileOutputStream(getFilePath(uploadedFileName), true)) {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = input.read(buffer)) != -1) {
-                        output.write(buffer, 0, bytesRead);
-                    }
-                    output.close();
-                }
-                input.close();
-                chunk.setFile(new File(getFilePath(uploadedFileName)));
+                saveChunkData(chunk, item);
             }
         }
 
         return chunk;
+    }
+
+    private static void setChunkField(PluploadChunk chunk, FileItemStream item) throws NumberFormatException, IOException {
+        String value = Streams.asString(item.openStream());
+        switch (item.getFieldName()) {
+            case "fileId":
+                chunk.setFileId(value);
+                break;
+            case "name":
+                chunk.setName(value);
+                break;
+            case "chunk":
+                chunk.setChunk(Integer.parseInt(value));
+                break;
+            case "chunks":
+                chunk.setChunks(Integer.parseInt(value));
+        }
+    }
+
+    private static void saveChunkData(PluploadChunk chunk, FileItemStream item) throws IOException {
+        String uploadedFileName = getFileName(chunk);
+        InputStream input = item.openStream();
+        try (FileOutputStream output = new FileOutputStream(getFilePath(uploadedFileName), true)) {
+            copyInputStreamToOutputStream(input, output);
+            output.close();
+        }
+        input.close();
+        chunk.setFile(new File(getFilePath(uploadedFileName)));
+    }
+
+    private static void copyInputStreamToOutputStream(InputStream input, final FileOutputStream output) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
     }
 
     protected static String getFileName(PluploadChunk chunk) {
