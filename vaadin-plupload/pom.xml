@@ -102,7 +102,7 @@
                             <Vaadin-Package-Version>1</Vaadin-Package-Version>
                             <Implementation-Title>${project.name}</Implementation-Title>
                             <Implementation-Version>${project.version}</Implementation-Version>
-                            <Vaadin-Widgetsets>com.zybnet.autocomplete.AutocompleteWidgetSet</Vaadin-Widgetsets>
+                            <Vaadin-Widgetsets>pl.exsio.plupload.PluploadWidgetSet</Vaadin-Widgetsets>
                         </manifestEntries>
                     </archive>
                     <excludes>
