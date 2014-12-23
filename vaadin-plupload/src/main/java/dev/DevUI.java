@@ -24,6 +24,7 @@
 package dev;
 
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.*;
@@ -31,6 +32,7 @@ import java.io.File;
 import javax.servlet.annotation.WebServlet;
 import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadFile;
+import pl.exsio.plupload.PluploadOption;
 import pl.exsio.plupload.field.PluploadField;
 import pl.exsio.plupload.helper.filter.PluploadFilter;
 import pl.exsio.plupload.helper.resize.PluploadImageResize;
@@ -54,34 +56,89 @@ public class DevUI extends UI {
         PluploadManager mgr = createUploadManager("Manager 1");
         PluploadManager mgr2 = createUploadManager("Manager 2");
 
-        mgr.getUploader().addFilter(new PluploadFilter("music", "mp3, flac"));
+        mgr.getUploader().addFilter(new PluploadFilter("music", "mp3,flac"));
         mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
         mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
 
         mainLayout.addComponent(mgr);
         mainLayout.addComponent(mgr2);
 
+        PluploadField<File> field = createUploadField();
+        mainLayout.addComponent(field);
+
+        Plupload uploader = createSimpleUploader();
+        mainLayout.addComponent(uploader);
+        
+        this.setContent(mainLayout);
+
+    }
+
+    private PluploadField<File> createUploadField() {
         final PluploadField<File> field = new PluploadField(File.class);
         field.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-
+            
             @Override
             public void onUploadComplete() {
                 File file = field.getValue();
-
+                
                 System.out.println(file != null ? file.getAbsolutePath() : "null");
             }
         });
+        return field;
+    }
 
-        mainLayout.addComponent(field);
+    private Plupload createSimpleUploader() {
+        //instantiate the uploader just as it was a norman Vaadin Button
+        final Plupload uploader = new Plupload("Browse", FontAwesome.FILES_O);
+        //set the maximum size of uploaded file
+        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
+        //prevent duplicate files
+        uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
+        //add filter
+        uploader.addFilter(new PluploadFilter("music", "mp3,flac"));
+        //add file uploaded handler
+        uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
 
-        this.setContent(mainLayout);
+            @Override
+            public void onFileUploaded(PluploadFile file) {
+                File uploadedFile = file.getUploadedFile();
+                System.out.println("This file was just uploaded: " + uploadedFile.getAbsolutePath());
+            }
+        });
+        //add upload completed handler
+        uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 
+            @Override
+            public void onUploadComplete() {
+                System.out.println("Upload was completed");
+                for (PluploadFile file : uploader.getUploadedFiles()) {
+                    System.out.println("Uploaded file " + file.getName() + " is located: " + file.getUploadedFile().getAbsolutePath());
+                }
+            }
+        });
+        //add upload pgoress handler
+        uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
+
+            @Override
+            public void onUploadProgress(PluploadFile file) {
+                System.out.println("I'm uploading file " + file.getName() + " and I'm at " + file.getPercent() + "%");
+            }
+        });
+        //add files added handler - autostart the uploader after files addition
+        uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
+
+            @Override
+            public void onFilesAdded(PluploadFile[] files) {
+                uploader.start();
+            }
+        });
+        return uploader;
     }
 
     private PluploadManager createUploadManager(final String name) {
         final PluploadManager mgr = new PluploadManager();
         mgr.getUploader().setUploadPath("/home/exsio");
-        System.out.println("upload path for "+name+": "+mgr.getUploader().getUploadPath());
+        System.out.println("upload path for " + name + ": " + mgr.getUploader().getUploadPath());
         mgr.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 
             @Override
