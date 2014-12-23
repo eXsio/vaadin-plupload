@@ -32,9 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
@@ -55,9 +53,9 @@ public class PluploadReceiver implements RequestHandler {
         return ReceiverHolder.instance;
     }
 
-    protected static final Set<String> expectedFileIds = Collections.synchronizedSet(new HashSet());
+    protected static final Map<String, String> expectedFileIds = Collections.synchronizedMap(new HashMap());
 
-    protected static final String UPLOAD_ACTION_PATH = "//pluploader-upload-action";
+    protected static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
 
     protected final String uploadActionPath;
 
@@ -79,6 +77,7 @@ public class PluploadReceiver implements RequestHandler {
         if (this.uploadedFiles.containsKey(fileId)) {
             File file = this.uploadedFiles.get(fileId);
             this.uploadedFiles.remove(fileId);
+            expectedFileIds.remove(fileId);
             return file;
         } else {
             return null;
@@ -87,8 +86,7 @@ public class PluploadReceiver implements RequestHandler {
 
     @Override
     public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
-
-        if (this.uploadActionPath.equals(request.getPathInfo())) {
+        if (this.uploadActionPath.equals(request.getPathInfo().replaceAll("/", ""))) {
             if (request instanceof VaadinServletRequest) {
                 VaadinServletRequest vsr = (VaadinServletRequest) request;
                 HttpServletRequest req = vsr.getHttpServletRequest();

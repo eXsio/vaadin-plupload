@@ -71,7 +71,9 @@ public class Plupload extends Button {
     protected final transient PluploadFilters filters = new PluploadFilters();
 
     protected PluploadImageResize imageResize = new PluploadImageResize();
-    
+
+    protected String uploadPath = System.getProperty("java.io.tmpdir");
+
     public Plupload() {
         super();
         this.registerRpc(serverRpc);
@@ -104,7 +106,7 @@ public class Plupload extends Button {
         this.handleFileUploaded();
         this.handleUploadComplete();
     }
-    
+
     protected static PluploadReceiver getReceiver() {
         return PluploadReceiver.getInstance();
     }
@@ -148,7 +150,7 @@ public class Plupload extends Button {
 
             @Override
             public void onFilesAdded(PluploadFile[] files) {
-                queue.addFiles(files);
+                queue.addFiles(files, uploadPath);
             }
         });
     }
@@ -215,8 +217,6 @@ public class Plupload extends Button {
         }
     };
 
-
-
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -281,6 +281,15 @@ public class Plupload extends Button {
     public PluploadFile[] getQueuedFiles() {
         Set<PluploadFile> files = this.queue.getPluploadFiles(PluploadQueue.Mode.NOT_UPLOADED);
         return files.toArray(new PluploadFile[files.size()]);
+    }
+
+    public String getUploadPath() {
+        return uploadPath;
+    }
+
+    public Plupload setUploadPath(String uploadPath) {
+        this.uploadPath = uploadPath;
+        return this;
     }
 
     public Plupload stop() {

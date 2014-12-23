@@ -38,8 +38,6 @@ import org.apache.commons.fileupload.util.Streams;
  */
 public class PluploadAppender {
 
-    protected static final String path = System.getProperty("java.io.tmpdir");
-
     public static PluploadChunk appendData(FileItemIterator items) throws IOException, FileUploadException {
         PluploadChunk chunk = new PluploadChunk();
         while (items.hasNext()) {
@@ -73,15 +71,16 @@ public class PluploadAppender {
     }
 
     private static void saveChunkData(PluploadChunk chunk, FileItemStream item) throws IOException {
-        if (PluploadReceiver.expectedFileIds.contains(chunk.getFileId())) {
+        if (PluploadReceiver.expectedFileIds.containsKey(chunk.getFileId())) {
             String uploadedFileName = getFileName(chunk);
+            String filePath = PluploadReceiver.expectedFileIds.get(chunk.getFileId()) + File.separator + uploadedFileName;
             InputStream input = item.openStream();
-            try (FileOutputStream output = new FileOutputStream(getFilePath(uploadedFileName), true)) {
+            try (FileOutputStream output = new FileOutputStream(filePath, true)) {
                 copyInputStreamToOutputStream(input, output);
                 output.close();
             }
             input.close();
-            chunk.setFile(new File(getFilePath(uploadedFileName)));
+            chunk.setFile(new File(filePath));
         }
     }
 
@@ -92,7 +91,7 @@ public class PluploadAppender {
             output.write(buffer, 0, bytesRead);
         }
     }
-    
+
     protected static PluploadReceiver getReceiver() {
         return PluploadReceiver.getInstance();
     }
@@ -106,7 +105,4 @@ public class PluploadAppender {
         return name.toString();
     }
 
-    protected static String getFilePath(String uploadedFileName) {
-        return path + File.separator + uploadedFileName;
-    }
 }

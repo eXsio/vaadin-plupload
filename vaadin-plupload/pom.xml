@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>pl.exsio</groupId>
     <artifactId>vaadin-plupload</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,12 +62,6 @@
         <resources>
             <resource>
                 <directory>src/main/java</directory>
-            </resource>
-            <resource>
-                <directory>src/main/webapp</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
             </resource>
         </resources>
         <plugins>
@@ -164,7 +158,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>vaadin-plupload</finalName>
+        <finalName>vaadin-plupload-${project.version}</finalName>
     </build>
     
     <profiles>

@@ -48,21 +48,21 @@ public class PluploadQueue {
         this.queue = new LinkedHashMap<>();
     }
 
-    public void addFile(PluploadFile file) {
+    public void addFile(PluploadFile file, String uploadPath) {
         this.queue.put(file.getId(), file);
+        PluploadReceiver.expectedFileIds.put(file.getId(), uploadPath);
     }
 
-    public void addFiles(PluploadFile[] files) {
+    public void addFiles(PluploadFile[] files, String uploadPath) {
         for (PluploadFile file : files) {
-            this.addFile(file);
-            PluploadReceiver.expectedFileIds.add(file.getId());
+            this.addFile(file, uploadPath);
         }
     }
 
     public void removeFile(String fileId) {
         if (this.queue.containsKey(fileId)) {
             this.queue.remove(fileId);
-            PluploadReceiver.expectedFileIds.add(fileId);
+            PluploadReceiver.expectedFileIds.remove(fileId);
         }
     }
 
