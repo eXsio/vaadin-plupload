@@ -182,7 +182,8 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
   mgr.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
   
   //set the client-side resizer
-  mgr.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
+  mgr.getUploader().setImageResize(new PluploadImageResize().setEnabled(true)
+   .setCrop(true).setHeight(200).setWidth(400));
   
   //add the component to layout
   layout.addComponent(mgr);
