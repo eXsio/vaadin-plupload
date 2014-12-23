@@ -83,7 +83,8 @@ There are 3 main components in this add-on:
             @Override
             public void onFileUploaded(PluploadFile file) {
                 File uploadedFile = file.getUploadedFile();
-                System.out.println("This file was just uploaded: " + uploadedFile.getAbsolutePath());
+                System.out.println("This file was just uploaded: " 
+                  + uploadedFile.getAbsolutePath());
             }
         });
 
@@ -94,7 +95,8 @@ There are 3 main components in this add-on:
             public void onUploadComplete() {
                 System.out.println("Upload was completed");
                 for (PluploadFile file : uploader.getUploadedFiles()) {
-                    System.out.println("Uploaded file " + file.getName() + " is located at: " + file.getUploadedFile().getAbsolutePath());
+                    System.out.println("Uploaded file " + file.getName() 
+                     + " is located at: " + file.getUploadedFile().getAbsolutePath());
                 }
             }
         });
@@ -104,7 +106,8 @@ There are 3 main components in this add-on:
 
             @Override
             public void onUploadProgress(PluploadFile file) {
-                System.out.println("I'm uploading file "+file.getName()+" and I'm at "+file.getPercent()+"%");
+                System.out.println("I'm uploading file " 
+                + file.getName() + " and I'm at " + file.getPercent() + "%");
             }
         });
 
