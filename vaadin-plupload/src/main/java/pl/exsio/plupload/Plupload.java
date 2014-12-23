@@ -273,6 +273,11 @@ public class Plupload extends Button {
 
     }
 
+    public Plupload refresh() {
+        this.getClient().refresh();
+        return this;
+    }
+
     public PluploadFile[] getUploadedFiles() {
         Set<PluploadFile> files = this.queue.getPluploadFiles(PluploadQueue.Mode.UPLOADED);
         return files.toArray(new PluploadFile[files.size()]);

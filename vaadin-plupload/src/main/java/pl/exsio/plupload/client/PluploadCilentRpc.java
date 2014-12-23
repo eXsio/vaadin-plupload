@@ -34,6 +34,8 @@ public interface PluploadCilentRpc extends ClientRpc {
     void start();
 
     void stop();
+    
+    void refresh();
 
     void disableBrowse(boolean disable);
 

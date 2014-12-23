@@ -76,6 +76,11 @@ public class PluploadConnector extends ButtonConnector {
             PluploadJSNIDelegate.removeFile(uploaderKey, fileId);
         }
 
+        @Override
+        public void refresh() {
+            PluploadJSNIDelegate.refreshUploader(uploaderKey);
+        }
+
     };
 
     @Override

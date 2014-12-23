@@ -23,6 +23,7 @@
  */
 package dev;
 
+import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
@@ -39,6 +40,7 @@ import pl.exsio.plupload.helper.resize.PluploadImageResize;
 import pl.exsio.plupload.manager.PluploadManager;
 
 @SuppressWarnings("serial")
+@Theme("valo")
 public class DevUI extends UI {
 
     @WebServlet(value = "/*", asyncSupported = false)
@@ -69,6 +71,20 @@ public class DevUI extends UI {
         Plupload uploader = createSimpleUploader();
         mainLayout.addComponent(uploader);
         
+        Button win = new Button("Win");
+        win.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                Window w = new Window("win");
+                Field f = createUploadField();
+                w.setContent(f);
+                w.setWidth("400px");
+                w.setHeight("200px");
+                getUI().addWindow(w);
+            }
+        });
+        mainLayout.addComponent(win);
         this.setContent(mainLayout);
 
     }

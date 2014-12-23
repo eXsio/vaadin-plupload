@@ -85,9 +85,13 @@ public class PluploadJSNIDelegate {
             
         uploader.bind('BeforeUpload', function (up, file) {
             up.settings.multipart_params = {fileId: file.id}
-        });
+        }); 
+            
         uploader.init();    
         $wnd.uploaders[uploaderKey] = uploader;    
+          
+       
+            
 
      }-*/;
     
@@ -104,6 +108,15 @@ public class PluploadJSNIDelegate {
        $wnd.uploaders = $wnd.uploaders || {};
        if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
             $wnd.uploaders[uploaderKey].stop();
+       }
+            
+    }-*/;
+    
+    public static native void refreshUploader(String uploaderKey)
+    /*-{
+       $wnd.uploaders = $wnd.uploaders || {};
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].refresh();
        }
             
     }-*/;
