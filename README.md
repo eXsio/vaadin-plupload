@@ -214,3 +214,8 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
 ### Troubleshooting
 
   This is a fairly new stuff and it's not properly polished yet, so there is a serious possibility that something can go wrong somewhere. Don't get angry at the code (or at me for that matter), just submit an issue or work on the problem and submit a pull request here: https://github.com/eXsio/vaadin-plupload. Cheers!
+
+
+### Known Bugs
+
+- sometimes clicking the button doesn't make the browse window appear. Currently under investigation...
