@@ -105,7 +105,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         layout.addComponent(this.uploader);
         layout.addComponent(vlayout);
         layout.addComponent(this.removeButton);
-        layout.setComponentAlignment(this.removeButton, Alignment.MIDDLE_RIGHT);
+        layout.setComponentAlignment(this.removeButton, Alignment.TOP_RIGHT);
         this.initHandlers();
         return layout;
     }
