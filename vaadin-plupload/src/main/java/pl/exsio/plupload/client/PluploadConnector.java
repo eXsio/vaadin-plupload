@@ -23,19 +23,24 @@
  */
 package pl.exsio.plupload.client;
 
-import pl.exsio.plupload.client.shared.PluploadState;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.user.client.ui.FileUpload;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
 import java.util.Random;
 import pl.exsio.plupload.Plupload;
+import pl.exsio.plupload.client.shared.PluploadState;
 
 /**
  *
  * @author exsio
  */
 @Connect(Plupload.class)
-public class PluploadConnector extends ButtonConnector {
+public class PluploadConnector extends ButtonConnector implements AttachEvent.Handler {
 
     protected PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
 
@@ -43,10 +48,30 @@ public class PluploadConnector extends ButtonConnector {
             + (new Random().nextInt(Integer.MAX_VALUE))
             + (new Random().nextInt(Integer.MAX_VALUE));
 
+    protected Element nativeUpload = new FileUpload().getElement();
+
+    @Override
+    public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+            nativeUpload.setAttribute("style", "display:none;");
+            getWidget().getElement().getOwnerDocument().getBody().appendChild(nativeUpload);
+            PluploadJSNIDelegate.createUploader(nativeUpload, serverRpc, this.uploaderKey);
+        } else {
+            getWidget().getElement().getOwnerDocument().getBody().removeChild(nativeUpload);
+        }
+    }
+
     public PluploadConnector() {
         super();
         registerRpc(PluploadCilentRpc.class, clientRpc);
-        PluploadJSNIDelegate.createUploader(this.getWidget().getElement(), serverRpc, this.uploaderKey);
+        getWidget().addAttachHandler(this);
+        getWidget().addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                PluploadJSNIDelegate.click(nativeUpload);
+            }
+        });
+
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {

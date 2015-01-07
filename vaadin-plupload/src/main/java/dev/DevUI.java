@@ -36,7 +36,6 @@ import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.PluploadOption;
 import pl.exsio.plupload.field.PluploadField;
 import pl.exsio.plupload.helper.filter.PluploadFilter;
-import pl.exsio.plupload.helper.resize.PluploadImageResize;
 import pl.exsio.plupload.manager.PluploadManager;
 
 @SuppressWarnings("serial")
@@ -46,6 +45,23 @@ public class DevUI extends UI {
     @WebServlet(value = "/*", asyncSupported = false)
     @VaadinServletConfiguration(productionMode = false, ui = DevUI.class, widgetset = "pl.exsio.plupload.PluploadWidgetSet")
     public static class DevServlet extends VaadinServlet {
+    }
+
+    private class Counter {
+
+        private int i = 0;
+
+        void increment() {
+            i++;
+        }
+
+        int get() {
+            return i;
+        }
+
+        void reset() {
+            i = 0;
+        }
     }
 
     @Override
@@ -60,7 +76,7 @@ public class DevUI extends UI {
 
         mgr.getUploader().addFilter(new PluploadFilter("music", "mp3,flac"));
         mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
-        mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
+        // mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
 
         mainLayout.addComponent(mgr);
         mainLayout.addComponent(mgr2);
@@ -70,20 +86,29 @@ public class DevUI extends UI {
 
         Plupload uploader = createSimpleUploader();
         mainLayout.addComponent(uploader);
-        
-        Button win = new Button("Win");
-        win.addClickListener(new Button.ClickListener() {
+        final Counter c = new Counter();
+        final Button.ClickListener l = new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Window w = new Window("win");
-                Field f = createUploadField();
-                w.setContent(f);
+
+                if (c.get() < 5) {
+                    w.setContent(new Button("win", this));
+                    c.increment();
+                } else {
+                    Field f = createUploadField();
+                    w.setContent(f);
+                    c.reset();
+                }
                 w.setWidth("400px");
                 w.setHeight("200px");
                 getUI().addWindow(w);
             }
-        });
+        };
+
+        Button win = new Button("Win");
+        win.addClickListener(l);
         mainLayout.addComponent(win);
         this.setContent(mainLayout);
 
@@ -92,11 +117,11 @@ public class DevUI extends UI {
     private PluploadField<File> createUploadField() {
         final PluploadField<File> field = new PluploadField(File.class);
         field.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-            
+
             @Override
             public void onUploadComplete() {
                 File file = field.getValue();
-                
+
                 System.out.println(file != null ? file.getAbsolutePath() : "null");
             }
         });

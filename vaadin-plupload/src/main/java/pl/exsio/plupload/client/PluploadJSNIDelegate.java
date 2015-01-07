@@ -30,6 +30,14 @@ import com.google.gwt.dom.client.Element;
  * @author exsio
  */
 public class PluploadJSNIDelegate {
+    
+    
+    public static native void click(Element element) 
+    /*-{
+            element.click();
+            console.info('attempted to click on element:');
+            console.log(element);
+    }-*/;
 
     public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
     /*-{
@@ -44,8 +52,7 @@ public class PluploadJSNIDelegate {
             multi_selection: true,
             multipart: true
         });
-               
-        uploader.disableBrowse(true);    
+                 
         uploader.bind('FilesAdded', function(up, files) {
             console.log('FILES ADDED');
                 console.info(arguments);
@@ -85,11 +92,11 @@ public class PluploadJSNIDelegate {
             
         uploader.bind('BeforeUpload', function (up, file) {
             up.settings.multipart_params = {fileId: file.id}
-        }); 
+        });  
             
         uploader.init();    
         $wnd.uploaders[uploaderKey] = uploader;    
-          
+        
        
             
 
