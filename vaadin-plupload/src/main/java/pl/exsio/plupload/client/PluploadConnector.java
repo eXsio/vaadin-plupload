@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.DOM;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
@@ -48,20 +48,19 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
             + (new Random().nextInt(Integer.MAX_VALUE))
             + (new Random().nextInt(Integer.MAX_VALUE));
 
-    protected final Element nativeUpload;
+    private Element uploadTrigger;
 
     protected boolean attached = false;
 
     public PluploadConnector() {
         super();
-        this.nativeUpload = new FileUpload().getElement();
-        this.nativeUpload.setAttribute("style", "display:none;");
+        this.createUploadTrigger();
         registerRpc(PluploadCilentRpc.class, this.clientRpc);
         getWidget().addAttachHandler(this);
         getWidget().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                PluploadJSNIDelegate.click(nativeUpload);
+                PluploadJSNIDelegate.click(uploadTrigger);
             }
         });
     }
@@ -77,8 +76,8 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
 
     protected void attachUploader() {
         if (!this.attached) {
-            getWidget().getElement().getOwnerDocument().getBody().appendChild(this.nativeUpload);
-            PluploadJSNIDelegate.createUploader(this.nativeUpload, this.serverRpc, this.uploaderKey);
+            getWidget().getElement().getOwnerDocument().getBody().appendChild(this.uploadTrigger);
+            PluploadJSNIDelegate.createUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey);
             this.attached = true;
         }
     }
@@ -86,9 +85,15 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
     protected void detachUploader() {
         if (this.attached) {
             PluploadJSNIDelegate.destroyUploader(this.uploaderKey);
-            getWidget().getElement().getOwnerDocument().getBody().removeChild(this.nativeUpload);
+            getWidget().getElement().getOwnerDocument().getBody().removeChild(this.uploadTrigger);
             this.attached = false;
         }
+    }
+
+    private void createUploadTrigger() {
+        this.uploadTrigger = DOM.createButton();
+        this.uploadTrigger.setAttribute("value", "upload_trigger_" + uploaderKey);
+        this.uploadTrigger.setAttribute("style", "display:none;");
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
