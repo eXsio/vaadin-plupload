@@ -83,7 +83,6 @@ public class PluploadManager extends VerticalLayout {
         this.handleUploadStart();
         this.handleUploadStop();
         this.handleUploadProgress();
-        this.handleFileUploaded();
         this.handleUploadComplete();
         this.handleStartButtonClick();
         this.handleStopButtonClick();
@@ -211,18 +210,6 @@ public class PluploadManager extends VerticalLayout {
         });
     }
 
-    private void handleFileUploaded() {
-        this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
-
-            @Override
-            public void onFileUploaded(PluploadFile file) {
-                if (itemsMap.containsKey(file.getId())) {
-                    itemsMap.get(file.getId()).setUploaded();
-                }
-            }
-        });
-    }
-
     private void handleUploadProgress() {
         this.uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
 
@@ -287,7 +274,7 @@ public class PluploadManager extends VerticalLayout {
             }
         });
     }
-    
+
     private void toggleStartButton() {
         startButton.setEnabled(uploader.getQueuedFiles().length > 0);
     }
@@ -321,15 +308,16 @@ public class PluploadManager extends VerticalLayout {
         protected Button removeButton;
 
         public Item(final PluploadFile file) {
+
+            this.setSpacing(true);
             this.progressBar = new ProgressBar();
             this.progressBar.setIndeterminate(false);
             this.progressBar.setValue(0f);
             this.progressBar.setWidth("270px");
 
-            this.setWidth("350px");
             this.setStyleName("plupload-mgr-item plupload-mgr-item-" + file.getId());
 
-            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 45));
+            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 33));
             this.nameLabel.setWidth("270px");
             this.nameLabel.setDescription(file.getName());
 
@@ -345,17 +333,14 @@ public class PluploadManager extends VerticalLayout {
             });
 
             VerticalLayout vlayout = new VerticalLayout();
-            vlayout.setSpacing(true);
+            vlayout.setSpacing(false);
             vlayout.addComponent(this.nameLabel);
-            HorizontalLayout hlayout = new HorizontalLayout();
-            hlayout.setSpacing(true);
-            hlayout.addComponent(this.progressBar);
-            hlayout.addComponent(this.percentLabel);
-
-            vlayout.addComponent(hlayout);
+            vlayout.addComponent(this.progressBar);
 
             this.addComponent(vlayout);
+            this.addComponent(this.percentLabel);
             this.addComponent(this.removeButton);
+            this.setComponentAlignment(this.percentLabel, Alignment.MIDDLE_CENTER);
             this.setComponentAlignment(this.removeButton, Alignment.MIDDLE_RIGHT);
 
         }
@@ -363,11 +348,6 @@ public class PluploadManager extends VerticalLayout {
         public void setProgress(long percent) {
             this.progressBar.setValue(new Long(percent).floatValue() / 100);
             this.percentLabel.setValue(percent + "%");
-        }
-
-        public void setUploaded() {
-            this.percentLabel.setValue("");
-            this.percentLabel.setIcon(FontAwesome.CHECK);
         }
 
         public ProgressBar getProgressBar() {

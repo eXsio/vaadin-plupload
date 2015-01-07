@@ -50,6 +50,8 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
 
     protected final Element nativeUpload;
 
+    protected boolean attached = false;
+
     public PluploadConnector() {
         super();
         this.nativeUpload = new FileUpload().getElement();
@@ -74,13 +76,19 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
     }
 
     protected void attachUploader() {
-        getWidget().getElement().getOwnerDocument().getBody().appendChild(this.nativeUpload);
-        PluploadJSNIDelegate.createUploader(this.nativeUpload, this.serverRpc, this.uploaderKey);
+        if (!this.attached) {
+            getWidget().getElement().getOwnerDocument().getBody().appendChild(this.nativeUpload);
+            PluploadJSNIDelegate.createUploader(this.nativeUpload, this.serverRpc, this.uploaderKey);
+            this.attached = true;
+        }
     }
 
     protected void detachUploader() {
-        PluploadJSNIDelegate.destroyUploader(this.uploaderKey);
-        getWidget().getElement().getOwnerDocument().getBody().removeChild(this.nativeUpload);
+        if (this.attached) {
+            PluploadJSNIDelegate.destroyUploader(this.uploaderKey);
+            getWidget().getElement().getOwnerDocument().getBody().removeChild(this.nativeUpload);
+            this.attached = false;
+        }
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {

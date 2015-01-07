@@ -55,7 +55,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
     protected String removeLabel = "";
 
-    protected final Plupload uploader;
+    protected Plupload uploader =  new Plupload(this.browseLabel, FontAwesome.FILES_O);;
 
     protected ProgressBar progressBar;
 
@@ -74,9 +74,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             throw new UnsupportedFieldTypeException("The types supported by this field are byte[] and java.io.File.");
         }
         this.returnTypeClass = returnTypeClass;
-        this.uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
-        this.uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
-        this.postConstruct();
     }
 
     @Override
@@ -85,7 +82,8 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.layout = new HorizontalLayout();
         this.layout.setMargin(true);
         this.layout.setSpacing(true);
-        this.layout.setWidth("300px");
+
+        this.uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
 
         this.progressBar = new ProgressBar();
         this.progressBar.setIndeterminate(false);
@@ -108,7 +106,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         layout.addComponent(vlayout);
         layout.addComponent(this.removeButton);
         layout.setComponentAlignment(this.removeButton, Alignment.MIDDLE_RIGHT);
-
+        this.initHandlers();
         return layout;
     }
 
@@ -116,7 +114,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         return this.uploader;
     }
 
-    private void postConstruct() {
+    private void initHandlers() {
 
         this.handleFilesAdded();
         this.handleFilesRemoved();
@@ -183,7 +181,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             public void onFilesAdded(final PluploadFile[] files) {
                 if (currentFile == null) {
                     currentFile = files[0];
-                    nameLabel.setValue(trimTextInTheMiddle(files[0].getName(), 18));
+                    nameLabel.setValue(trimTextInTheMiddle(files[0].getName(), 14));
                     nameLabel.setDescription(files[0].getName());
                     removeButton.setVisible(true);
                     progressBar.setVisible(true);
