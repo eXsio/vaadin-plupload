@@ -181,4 +181,14 @@ public class PluploadJSNIDelegate {
             $wnd.uploaders[uploaderKey].removeFile($wnd.uploaders[uploaderKey].getFile(fileId));
        }   
     }-*/;
+    
+    
+    public static native void destroyUploader(String uploaderKey)
+    /*-{
+       $wnd.uploaders = $wnd.uploaders || {};
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            $wnd.uploaders[uploaderKey].destroy();
+            delete $wnd.uploaders[uploaderKey];
+       }   
+    }-*/;
 }

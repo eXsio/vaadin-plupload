@@ -48,22 +48,13 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
             + (new Random().nextInt(Integer.MAX_VALUE))
             + (new Random().nextInt(Integer.MAX_VALUE));
 
-    protected Element nativeUpload = new FileUpload().getElement();
-
-    @Override
-    public void onAttachOrDetach(AttachEvent event) {
-        if (event.isAttached()) {
-            nativeUpload.setAttribute("style", "display:none;");
-            getWidget().getElement().getOwnerDocument().getBody().appendChild(nativeUpload);
-            PluploadJSNIDelegate.createUploader(nativeUpload, serverRpc, this.uploaderKey);
-        } else {
-            getWidget().getElement().getOwnerDocument().getBody().removeChild(nativeUpload);
-        }
-    }
+    protected final Element nativeUpload;
 
     public PluploadConnector() {
         super();
-        registerRpc(PluploadCilentRpc.class, clientRpc);
+        this.nativeUpload = new FileUpload().getElement();
+        this.nativeUpload.setAttribute("style", "display:none;");
+        registerRpc(PluploadCilentRpc.class, this.clientRpc);
         getWidget().addAttachHandler(this);
         getWidget().addClickHandler(new ClickHandler() {
             @Override
@@ -71,7 +62,25 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
                 PluploadJSNIDelegate.click(nativeUpload);
             }
         });
+    }
 
+    @Override
+    public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+            this.attachUploader();
+        } else {
+            this.detachUploader();
+        }
+    }
+
+    protected void attachUploader() {
+        getWidget().getElement().getOwnerDocument().getBody().appendChild(this.nativeUpload);
+        PluploadJSNIDelegate.createUploader(this.nativeUpload, this.serverRpc, this.uploaderKey);
+    }
+
+    protected void detachUploader() {
+        PluploadJSNIDelegate.destroyUploader(this.uploaderKey);
+        getWidget().getElement().getOwnerDocument().getBody().removeChild(this.nativeUpload);
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
@@ -107,11 +116,6 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
         }
 
     };
-
-    @Override
-    public void init() {
-        super.init();
-    }
 
     @Override
     public PluploadWidget getWidget() {
