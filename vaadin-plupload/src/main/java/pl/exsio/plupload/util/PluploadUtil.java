@@ -23,11 +23,13 @@
  */
 package pl.exsio.plupload.util;
 
+import java.io.Serializable;
+
 /**
  *
  * @author exsio
  */
-public class PluploadUtil {
+public class PluploadUtil implements Serializable {
 
     public static String trimTextInTheMiddle(String text, int length) {
 

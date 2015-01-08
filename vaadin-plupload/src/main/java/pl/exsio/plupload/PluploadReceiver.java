@@ -30,6 +30,7 @@ import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  *
  * @author exsio
  */
-public class PluploadReceiver implements RequestHandler {
+public class PluploadReceiver implements RequestHandler, Serializable {
 
     private static class ReceiverHolder {
 

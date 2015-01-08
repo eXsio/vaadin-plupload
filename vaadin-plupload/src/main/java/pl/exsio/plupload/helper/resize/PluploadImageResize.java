@@ -24,12 +24,13 @@
 package pl.exsio.plupload.helper.resize;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
 /**
  *
  * @author exsio
  */
-public class PluploadImageResize {
+public class PluploadImageResize implements Serializable {
 
     @SerializedName("enabled")
     protected boolean enabled = false;

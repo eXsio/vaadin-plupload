@@ -23,11 +23,13 @@
  */
 package pl.exsio.plupload.ex;
 
+import java.io.Serializable;
+
 /**
  *
  * @author exsio
  */
-public class UnsupportedFieldTypeException extends RuntimeException {
+public class UnsupportedFieldTypeException extends RuntimeException implements Serializable {
 
     public UnsupportedFieldTypeException(String msg) {
         super(msg);

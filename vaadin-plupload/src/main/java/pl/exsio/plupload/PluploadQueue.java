@@ -24,6 +24,7 @@
 package pl.exsio.plupload;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -33,7 +34,7 @@ import java.util.Set;
  *
  * @author exsio
  */
-public class PluploadQueue {
+public class PluploadQueue implements Serializable {
 
     protected final Map<String, PluploadFile> queue;
 

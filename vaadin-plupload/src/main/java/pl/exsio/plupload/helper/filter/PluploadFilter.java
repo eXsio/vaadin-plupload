@@ -24,13 +24,14 @@
 package pl.exsio.plupload.helper.filter;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author exsio
  */
-public class PluploadFilter {
+public class PluploadFilter implements Serializable {
 
     @SerializedName("title")
     protected String title;

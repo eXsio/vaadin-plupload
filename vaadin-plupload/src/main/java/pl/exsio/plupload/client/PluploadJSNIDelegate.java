@@ -24,12 +24,13 @@
 package pl.exsio.plupload.client;
 
 import com.google.gwt.dom.client.Element;
+import java.io.Serializable;
 
 /**
  *
  * @author exsio
  */
-public class PluploadJSNIDelegate {
+public class PluploadJSNIDelegate implements Serializable {
 
     public static native void click(Element button) 
     /*-{    

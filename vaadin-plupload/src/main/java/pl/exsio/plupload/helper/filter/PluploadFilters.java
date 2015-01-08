@@ -24,6 +24,7 @@
 package pl.exsio.plupload.helper.filter;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.List;
  *
  * @author exsio
  */
-public class PluploadFilters {
+public class PluploadFilters implements Serializable {
 
     @SerializedName("mime_types")
     protected PluploadFilter[] mimeTypes = new PluploadFilter[0];

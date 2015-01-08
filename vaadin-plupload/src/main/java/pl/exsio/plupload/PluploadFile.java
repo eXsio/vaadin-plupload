@@ -24,13 +24,14 @@
 package pl.exsio.plupload;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author exsio
  */
-public class PluploadFile {
+public class PluploadFile implements Serializable {
 
     protected int percent;
 

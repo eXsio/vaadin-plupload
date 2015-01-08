@@ -24,12 +24,13 @@
 package pl.exsio.plupload;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  *
  * @author exsio
  */
-public class PluploadChunk {
+public class PluploadChunk implements Serializable {
 
     protected String fileId;
 

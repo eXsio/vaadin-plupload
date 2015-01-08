@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -36,7 +37,7 @@ import org.apache.commons.fileupload.util.Streams;
  *
  * @author exsio
  */
-public class PluploadAppender {
+public class PluploadAppender implements Serializable {
 
     public static PluploadChunk appendData(FileItemIterator items) throws IOException, FileUploadException {
         PluploadChunk chunk = new PluploadChunk();
