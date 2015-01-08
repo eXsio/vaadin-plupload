@@ -217,12 +217,6 @@ public class Plupload extends Button {
         }
     };
 
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        this.disableBrowse(!enabled);
-    }
-
     public Plupload disableBrowse(boolean disable) {
         this.getClient().disableBrowse(disable);
         return this;

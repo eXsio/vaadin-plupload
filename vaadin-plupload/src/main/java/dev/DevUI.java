@@ -84,7 +84,16 @@ public class DevUI extends UI {
         PluploadField<File> field = createUploadField();
         mainLayout.addComponent(field);
 
-        Plupload uploader = createSimpleUploader();
+        final Plupload uploader = createSimpleUploader();
+        uploader.setEnabled(false);
+        Button b = new Button("toggle Enabled!", new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                uploader.setEnabled(!uploader.isEnabled());
+            }
+        });
+        mainLayout.addComponent(b);
         mainLayout.addComponent(uploader);
         final Counter c = new Counter();
         final Button.ClickListener l = new Button.ClickListener() {
@@ -149,7 +158,7 @@ public class DevUI extends UI {
         uploader.setOption(PluploadOption.MAX_FILE_SIZE, "5mb");
         //prevent duplicate files
         uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
-        
+
         uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
         //add filter
         uploader.addFilter(new PluploadFilter("music", "mp3,flac"));

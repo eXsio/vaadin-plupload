@@ -31,6 +31,11 @@ import com.google.gwt.dom.client.Element;
  */
 public class PluploadJSNIDelegate {
 
+    public static native void click(Element button) 
+    /*-{    
+            button.click();
+    }-*/;
+    
     public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
     /*-{
         $wnd.uploaders = $wnd.uploaders || {};
@@ -75,11 +80,7 @@ public class PluploadJSNIDelegate {
             
         uploader.bind('BeforeUpload', function (up, file) {
             up.settings.multipart_params = {fileId: file.id}
-        }); 
-            
-        uploader.bind('Init', function () {
-           // uploader.refresh();
-        });     
+        });      
             
         uploader.init();    
         $wnd.uploaders[uploaderKey] = uploader;    

@@ -23,7 +23,11 @@
  */
 package pl.exsio.plupload.client;
 
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.user.client.DOM;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
@@ -44,10 +48,11 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
             + (new Random().nextInt(Integer.MAX_VALUE))
             + (new Random().nextInt(Integer.MAX_VALUE));
 
+    private Element uploadTrigger;
+
     public PluploadConnector() {
         this.registerRpc(PluploadCilentRpc.class, this.clientRpc);
         this.getWidget().addAttachHandler(this);
-        this.getWidget().getElement().setAttribute("data-uploader-id", this.uploaderKey);
     }
 
     @Override
@@ -60,11 +65,27 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
     }
 
     protected void attachUploader() {
-        PluploadJSNIDelegate.createUploader(this.getWidget().getElement(), this.serverRpc, this.uploaderKey);
+        this.createUploadTrigger();
+        getWidget().getElement().getOwnerDocument().getBody().appendChild(this.uploadTrigger);
+        PluploadJSNIDelegate.createUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey);
+        getWidget().addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                PluploadJSNIDelegate.click(uploadTrigger);
+            }
+        });
+        this.getWidget().getElement().setAttribute("data-uploader-id", this.uploaderKey);
     }
 
     protected void detachUploader() {
         PluploadJSNIDelegate.destroyUploader(this.uploaderKey);
+        getWidget().getElement().getOwnerDocument().getBody().removeChild(this.uploadTrigger);
+    }
+
+    private void createUploadTrigger() {
+        this.uploadTrigger = DOM.createButton();
+        this.uploadTrigger.setAttribute("value", "upload_trigger_" + uploaderKey);
+        this.uploadTrigger.setAttribute("style", "display:none;");
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
