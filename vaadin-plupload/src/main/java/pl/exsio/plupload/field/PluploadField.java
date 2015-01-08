@@ -75,6 +75,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             throw new UnsupportedFieldTypeException("The types supported by this field are byte[] and java.io.File.");
         }
         this.returnTypeClass = returnTypeClass;
+        this.initHandlers();
     }
 
     @Override
@@ -107,7 +108,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         layout.addComponent(vlayout);
         layout.addComponent(this.removeButton);
         layout.setComponentAlignment(this.removeButton, Alignment.TOP_RIGHT);
-        this.initHandlers();
+
         return layout;
     }
 
