@@ -30,6 +30,7 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
 import java.io.File;
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import pl.exsio.plupload.client.PluploadCilentRpc;
@@ -398,47 +399,47 @@ public class Plupload extends Button {
         return this;
     }
 
-    public interface FilesAddedListener {
+    public interface FilesAddedListener extends Serializable {
 
         void onFilesAdded(PluploadFile[] files);
     }
 
-    public interface FilesRemovedListener {
+    public interface FilesRemovedListener extends Serializable {
 
         void onFilesRemoved(PluploadFile[] files);
     }
 
-    public interface FileFilteredListener {
+    public interface FileFilteredListener extends Serializable {
 
         void onFileFiltered(PluploadFile file);
     }
 
-    public interface FileUploadedListener {
+    public interface FileUploadedListener extends Serializable {
 
         void onFileUploaded(PluploadFile file);
     }
 
-    public interface UploadStartListener {
+    public interface UploadStartListener extends Serializable {
 
         void onUploadStart();
     }
 
-    public interface UploadProgressListener {
+    public interface UploadProgressListener extends Serializable {
 
         void onUploadProgress(PluploadFile file);
     }
 
-    public interface UploadStopListener {
+    public interface UploadStopListener extends Serializable {
 
         void onUploadStop();
     }
 
-    public interface UploadCompleteListener {
+    public interface UploadCompleteListener extends Serializable {
 
         void onUploadComplete();
     }
 
-    public interface ErrorListener {
+    public interface ErrorListener extends Serializable {
 
         void onError();
     }
