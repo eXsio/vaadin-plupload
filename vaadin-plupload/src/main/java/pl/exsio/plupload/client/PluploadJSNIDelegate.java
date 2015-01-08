@@ -35,8 +35,6 @@ public class PluploadJSNIDelegate {
     public static native void click(Element element) 
     /*-{
             element.click();
-            console.info('attempted to click on element:');
-            console.log(element);
     }-*/;
 
     public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
@@ -54,39 +52,30 @@ public class PluploadJSNIDelegate {
         });
                  
         uploader.bind('FilesAdded', function(up, files) {
-            console.log('FILES ADDED');
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesAdded(Ljava/lang/String;)(JSON.stringify(files));
         });
 
         uploader.bind('FilesRemoved', function(up, files) {
-            console.log('FILES REMOVED');
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesRemoved(Ljava/lang/String;)(JSON.stringify(files));
         });
 
         uploader.bind('FileFiltered', function(up, file) {
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileFiltered(Ljava/lang/String;)(JSON.stringify(file));
         });
 
         uploader.bind('FileUploaded', function(up, file) {
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileUploaded(Ljava/lang/String;)(JSON.stringify(file));
         });
 
         uploader.bind('UploadProgress', function(up, file) {
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadProgress(Ljava/lang/String;)(JSON.stringify(file));
         });
 
         uploader.bind('UploadComplete', function(up, files) {
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadComplete()();
         });
 
         uploader.bind('Error', function(up, files) {
-                console.info(arguments);
                 rpc.@pl.exsio.plupload.client.PluploadServerRpc::error()();
         });
             
@@ -168,8 +157,6 @@ public class PluploadJSNIDelegate {
                     optionValue = value;
                  }   
             }
-            console.info("setting uploader option "+ name);
-            console.info(optionValue);
             $wnd.uploaders[uploaderKey].setOption(name, optionValue);
        }
     }-*/;

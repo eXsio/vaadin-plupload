@@ -110,6 +110,20 @@ public class DevUI extends UI {
         Button win = new Button("Win");
         win.addClickListener(l);
         mainLayout.addComponent(win);
+
+        Button modal = new Button("modal");
+        modal.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                Window w = new Window("modal");
+                Field f = createUploadField();
+                w.setContent(f);
+                w.setModal(true);
+                getUI().addWindow(w);
+            }
+        });
+        mainLayout.addComponent(modal);
         this.setContent(mainLayout);
 
     }

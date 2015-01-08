@@ -42,7 +42,7 @@ import pl.exsio.plupload.client.shared.PluploadState;
 @Connect(Plupload.class)
 public class PluploadConnector extends ButtonConnector implements AttachEvent.Handler {
 
-    protected PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
+    protected final PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
 
     protected final String uploaderKey = "" + (new Random().nextInt(Integer.MAX_VALUE))
             + (new Random().nextInt(Integer.MAX_VALUE))
@@ -50,7 +50,7 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
 
     private Element uploadTrigger;
 
-    protected boolean attached = false;
+    private boolean attached = false;
 
     public PluploadConnector() {
         super();
