@@ -55,7 +55,8 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
     protected String removeLabel = "";
 
-    protected Plupload uploader =  new Plupload(this.browseLabel, FontAwesome.FILES_O);;
+    protected Plupload uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
+    ;
 
     protected ProgressBar progressBar;
 
@@ -179,20 +180,26 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
             @Override
             public void onFilesAdded(final PluploadFile[] files) {
-                if (currentFile == null) {
-                    currentFile = files[0];
-                    nameLabel.setValue(trimTextInTheMiddle(files[0].getName(), 14));
-                    nameLabel.setDescription(files[0].getName());
-                    removeButton.setVisible(true);
-                    progressBar.setVisible(true);
-                    removeButton.addClickListener(new Button.ClickListener() {
+                if (files.length == 1) {
+                    if (currentFile == null) {
+                        currentFile = files[0];
+                        nameLabel.setValue(trimTextInTheMiddle(files[0].getName(), 14));
+                        nameLabel.setDescription(files[0].getName());
+                        removeButton.setVisible(true);
+                        progressBar.setVisible(true);
+                        removeButton.addClickListener(new Button.ClickListener() {
 
-                        @Override
-                        public void buttonClick(Button.ClickEvent event) {
-                            uploader.removeFile(files[0].getId());
-                        }
-                    });
-                    uploader.start();
+                            @Override
+                            public void buttonClick(Button.ClickEvent event) {
+                                uploader.removeFile(files[0].getId());
+                            }
+                        });
+                        uploader.start();
+                    }
+                } else {
+                    for (PluploadFile file : files) {
+                        uploader.removeFile(file.getId());
+                    }
                 }
             }
         });

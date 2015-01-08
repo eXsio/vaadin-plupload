@@ -57,12 +57,9 @@ public class PluploadReceiver implements RequestHandler {
 
     protected static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
 
-    protected final String uploadActionPath;
-
     protected final Map<String, File> uploadedFiles;
 
     private PluploadReceiver() {
-        this.uploadActionPath = UPLOAD_ACTION_PATH;
         this.uploadedFiles = new HashMap<>();
     }
 
@@ -86,7 +83,7 @@ public class PluploadReceiver implements RequestHandler {
 
     @Override
     public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
-        if (this.uploadActionPath.equals(request.getPathInfo().replaceAll("/", ""))) {
+        if (UPLOAD_ACTION_PATH.equals(request.getPathInfo().replaceAll("/", ""))) {
             if (request instanceof VaadinServletRequest) {
                 VaadinServletRequest vsr = (VaadinServletRequest) request;
                 HttpServletRequest req = vsr.getHttpServletRequest();

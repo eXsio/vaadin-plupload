@@ -146,9 +146,11 @@ public class DevUI extends UI {
         //instantiate the uploader just as it was a norman Vaadin Button
         final Plupload uploader = new Plupload("Browse", FontAwesome.FILES_O);
         //set the maximum size of uploaded file
-        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
+        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "5mb");
         //prevent duplicate files
         uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
+        
+        uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
         //add filter
         uploader.addFilter(new PluploadFilter("music", "mp3,flac"));
         //add file uploaded handler
@@ -211,6 +213,8 @@ public class DevUI extends UI {
                 System.out.println("This file was filtered: " + file.getName());
             }
         });
+        mgr.getUploader().setOption(PluploadOption.MAX_FILE_SIZE, "5mb");
+        mgr.getUploader().setOption(PluploadOption.MULTI_SELECTION, "true");
         return mgr;
     }
 

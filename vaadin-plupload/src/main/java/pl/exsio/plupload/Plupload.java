@@ -42,8 +42,7 @@ import pl.exsio.plupload.helper.resize.PluploadImageResize;
  * @author exsio
  */
 @JavaScript({
-    "client/js/moxie.js",
-    "client/js/plupload.dev.js"
+    "client/js/plupload.js"
 })
 public class Plupload extends Button {
 

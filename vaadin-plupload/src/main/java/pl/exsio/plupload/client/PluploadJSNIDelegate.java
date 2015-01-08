@@ -30,12 +30,6 @@ import com.google.gwt.dom.client.Element;
  * @author exsio
  */
 public class PluploadJSNIDelegate {
-    
-    
-    public static native void click(Element element) 
-    /*-{
-            element.click();
-    }-*/;
 
     public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
     /*-{
@@ -81,13 +75,14 @@ public class PluploadJSNIDelegate {
             
         uploader.bind('BeforeUpload', function (up, file) {
             up.settings.multipart_params = {fileId: file.id}
-        });  
+        }); 
+            
+        uploader.bind('Init', function () {
+           // uploader.refresh();
+        });     
             
         uploader.init();    
         $wnd.uploaders[uploaderKey] = uploader;    
-        
-       
-            
 
      }-*/;
     
@@ -157,6 +152,8 @@ public class PluploadJSNIDelegate {
                     optionValue = value;
                  }   
             }
+            console.log('Setting uploader "'+uploaderKey+'" option "'+name+'":');
+            console.log(optionValue);
             $wnd.uploaders[uploaderKey].setOption(name, optionValue);
        }
     }-*/;
