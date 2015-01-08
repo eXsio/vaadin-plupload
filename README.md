@@ -218,4 +218,4 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
 
 ### Known Bugs
 
-- sometimes clicking the button doesn't make the browse window appear. Currently under investigation...
+- Due to some bug in original plupload library setting `multi_selection` to false doesn't take effect in the browser.
