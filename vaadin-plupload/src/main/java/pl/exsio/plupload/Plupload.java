@@ -31,9 +31,12 @@ import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
 import java.io.File;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
+import org.apache.commons.codec.digest.DigestUtils;
 import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.client.shared.PluploadState;
 import pl.exsio.plupload.client.PluploadServerRpc;
@@ -78,9 +81,10 @@ public class Plupload extends Button {
 
     protected String uploadPath = System.getProperty("java.io.tmpdir");
 
-    protected final String uploaderKey = "" + (new Random().nextInt(Integer.MAX_VALUE))
-            + (new Random().nextInt(Integer.MAX_VALUE))
-            + (new Random().nextInt(Integer.MAX_VALUE));
+    protected final String uploaderKey = DigestUtils.md2Hex(
+            new Random().nextInt(Integer.MAX_VALUE)
+            + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())
+            + new Random().nextInt(Integer.MAX_VALUE));
 
     public Plupload() {
         super();
