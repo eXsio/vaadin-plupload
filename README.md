@@ -14,7 +14,7 @@ In order to install, for now You have to download and compile the project, and t
 
 ---
 
-### Why is this add-on is worthy of Your interest?
+### Why is this add-on worthy of Your interest?
 
 Well, there is a number of reasons, but the main ones are:
 - Live upload progress updates without any needs of Push dependencies or enabled asyncSupported feature.
