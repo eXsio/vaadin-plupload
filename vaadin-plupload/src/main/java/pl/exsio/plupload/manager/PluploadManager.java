@@ -86,6 +86,7 @@ public class PluploadManager extends VerticalLayout {
         this.handleUploadComplete();
         this.handleStartButtonClick();
         this.handleStopButtonClick();
+        //this.handleUploaderDestroy();
     }
 
     private void initManager() {
@@ -271,6 +272,17 @@ public class PluploadManager extends VerticalLayout {
                     addItem(file.getId(), item);
                 }
                 toggleStartButton();
+            }
+        });
+    }
+
+    private void handleUploaderDestroy() {
+        this.uploader.addDestroyListener(new Plupload.DestroyListener() {
+
+            @Override
+            public void onDestroy() {
+                itemsContainer.removeAllComponents();
+                itemsMap.clear();
             }
         });
     }

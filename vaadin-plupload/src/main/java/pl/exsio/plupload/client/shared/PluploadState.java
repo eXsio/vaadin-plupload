@@ -23,7 +23,6 @@
  */
 package pl.exsio.plupload.client.shared;
 
-
 import com.vaadin.shared.ui.button.ButtonState;
 
 /**
@@ -31,5 +30,7 @@ import com.vaadin.shared.ui.button.ButtonState;
  * @author exsio
  */
 public class PluploadState extends ButtonState {
+
+    public String uploaderKey;
 
 }

@@ -23,6 +23,7 @@
  */
 package pl.exsio.plupload.field;
 
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -155,24 +156,28 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         });
     }
 
+    private void handleUploaderDestroy() {
+        this.uploader.addDestroyListener(new Plupload.DestroyListener() {
+
+            @Override
+            public void onDestroy() {
+                if (currentFile != null) {
+                    resetField();
+                }
+            }
+        });
+    }
+
     private void handleFilesRemoved() {
         this.uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
 
             @Override
             public void onFilesRemoved(PluploadFile[] files) {
                 if (files[0].equals(currentFile)) {
-                    nameLabel.setValue("");
-                    nameLabel.setDescription("");
-                    progressBar.setValue(0f);
-                    progressBar.setVisible(false);
-                    removeButton.setVisible(false);
-                    for (Object listener : removeButton.getListeners(Button.ClickListener.class)) {
-                        removeButton.removeClickListener((Button.ClickListener) listener);
-                    }
-                    currentFile = null;
-                    setValue(null);
+                    resetField();
                 }
             }
+
         });
     }
 
@@ -209,6 +214,19 @@ public class PluploadField<T extends Object> extends CustomField<T> {
     @Override
     public Class<? extends T> getType() {
         return this.returnTypeClass;
+    }
+
+    private void resetField() throws Converter.ConversionException, ReadOnlyException {
+        nameLabel.setValue("");
+        nameLabel.setDescription("");
+        progressBar.setValue(0f);
+        progressBar.setVisible(false);
+        removeButton.setVisible(false);
+        for (Object listener : removeButton.getListeners(Button.ClickListener.class)) {
+            removeButton.removeClickListener((Button.ClickListener) listener);
+        }
+        currentFile = null;
+        setValue(null);
     }
 
 }

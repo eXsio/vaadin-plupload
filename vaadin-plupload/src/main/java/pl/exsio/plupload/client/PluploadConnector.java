@@ -28,10 +28,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.user.client.DOM;
+import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
-import java.util.Random;
 import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.client.shared.PluploadState;
 
@@ -44,28 +44,22 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
 
     protected final PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
 
-    protected final String uploaderKey = "" + (new Random().nextInt(Integer.MAX_VALUE))
-            + (new Random().nextInt(Integer.MAX_VALUE))
-            + (new Random().nextInt(Integer.MAX_VALUE));
-
     private Element uploadTrigger;
+
+    protected String uploaderKey;
 
     public PluploadConnector() {
         this.registerRpc(PluploadCilentRpc.class, this.clientRpc);
         this.getWidget().addAttachHandler(this);
-    }
-
-    @Override
-    public void onAttachOrDetach(AttachEvent event) {
-        if (event.isAttached()) {
+        if (this.getState().uploaderKey != null) {
             this.attachUploader();
-        } else {
-            this.detachUploader();
         }
     }
 
-    protected void attachUploader() {
-        this.createUploadTrigger();
+    @OnStateChange("uploaderKey")
+    private void attachUploader() {
+        this.uploaderKey = this.getState().uploaderKey;
+        this.fetchUploadTrigger();
         getWidget().getElement().getOwnerDocument().getBody().appendChild(this.uploadTrigger);
         PluploadJSNIDelegate.createUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey);
         getWidget().addClickHandler(new ClickHandler() {
@@ -77,15 +71,25 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
         this.getWidget().getElement().setAttribute("data-uploader-id", this.uploaderKey);
     }
 
-    protected void detachUploader() {
-        PluploadJSNIDelegate.destroyUploader(this.uploaderKey);
-        getWidget().getElement().getOwnerDocument().getBody().removeChild(this.uploadTrigger);
+    private void fetchUploadTrigger() {
+        String triggerId = this.getUploadTriggerId();
+        Element trigger = DOM.getElementById(triggerId);
+        if (trigger == null) {
+            trigger = this.createUploadTrigger(trigger, triggerId);
+        }
+        this.uploadTrigger = trigger;
     }
 
-    private void createUploadTrigger() {
-        this.uploadTrigger = DOM.createButton();
-        this.uploadTrigger.setAttribute("value", "upload_trigger_" + uploaderKey);
-        this.uploadTrigger.setAttribute("style", "display:none;");
+    private String getUploadTriggerId() {
+        String triggerId = "upload-trigger-" + this.uploaderKey;
+        return triggerId;
+    }
+
+    private Element createUploadTrigger(Element trigger, String triggerId) {
+        trigger = DOM.createButton();
+        trigger.setAttribute("id", triggerId);
+        trigger.setAttribute("style", "display:none;");
+        return trigger;
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {
@@ -120,6 +124,12 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
             PluploadJSNIDelegate.refreshUploader(uploaderKey);
         }
 
+        @Override
+        public void destroy() {
+            PluploadJSNIDelegate.destroyUploader(uploaderKey);
+            getWidget().getElement().getOwnerDocument().getBody().removeChild(uploadTrigger);
+        }
+
     };
 
     @Override
@@ -130,6 +140,13 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
     @Override
     public PluploadState getState() {
         return (PluploadState) super.getState();
+    }
+
+    @Override
+    public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+            this.clientRpc.refresh();
+        }
     }
 
 }

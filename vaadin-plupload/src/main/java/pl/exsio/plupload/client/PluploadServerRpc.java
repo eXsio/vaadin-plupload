@@ -44,5 +44,7 @@ public interface PluploadServerRpc extends ServerRpc {
     void error();
 
     void fileFiltered(String json);
+    
+    void destroy();
 
 }

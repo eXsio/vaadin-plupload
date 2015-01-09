@@ -40,52 +40,57 @@ public class PluploadJSNIDelegate implements Serializable {
     public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
     /*-{
         $wnd.uploaders = $wnd.uploaders || {};
-        var uploader = new $wnd.plupload.Uploader({
-            browse_button: button,
-            url: 'pluploader-upload-action',
-            max_file_size : '1000mb',
-            chunk_size: '1mb',
-            max_retries: 3,
-            runtimes: "html5",
-            multi_selection: true,
-            multipart: true
-        });
-                 
-        uploader.bind('FilesAdded', function(up, files) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesAdded(Ljava/lang/String;)(JSON.stringify(files));
-        });
+        if(typeof $wnd.uploaders[uploaderKey] === 'undefined') {
+            var uploader = new $wnd.plupload.Uploader({
+                browse_button: button,
+                url: 'pluploader-upload-action',
+                max_file_size : '1000mb',
+                chunk_size: '1mb',
+                max_retries: 3,
+                runtimes: "html5",
+                multi_selection: true,
+                multipart: true
+            });
 
-        uploader.bind('FilesRemoved', function(up, files) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesRemoved(Ljava/lang/String;)(JSON.stringify(files));
-        });
+            uploader.bind('FilesAdded', function(up, files) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesAdded(Ljava/lang/String;)(JSON.stringify(files));
+            });
 
-        uploader.bind('FileFiltered', function(up, file) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileFiltered(Ljava/lang/String;)(JSON.stringify(file));
-        });
+            uploader.bind('FilesRemoved', function(up, files) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesRemoved(Ljava/lang/String;)(JSON.stringify(files));
+            });
 
-        uploader.bind('FileUploaded', function(up, file) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileUploaded(Ljava/lang/String;)(JSON.stringify(file));
-        });
+            uploader.bind('FileFiltered', function(up, file) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileFiltered(Ljava/lang/String;)(JSON.stringify(file));
+            });
 
-        uploader.bind('UploadProgress', function(up, file) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadProgress(Ljava/lang/String;)(JSON.stringify(file));
-        });
+            uploader.bind('FileUploaded', function(up, file) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileUploaded(Ljava/lang/String;)(JSON.stringify(file));
+            });
 
-        uploader.bind('UploadComplete', function(up, files) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadComplete()();
-        });
+            uploader.bind('UploadProgress', function(up, file) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadProgress(Ljava/lang/String;)(JSON.stringify(file));
+            });
 
-        uploader.bind('Error', function(up, files) {
-                rpc.@pl.exsio.plupload.client.PluploadServerRpc::error()();
-        });
+            uploader.bind('UploadComplete', function(up, files) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadComplete()();
+            });
+
+            uploader.bind('Error', function(up, files) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::error()();
+            });
             
-        uploader.bind('BeforeUpload', function (up, file) {
-            up.settings.multipart_params = {fileId: file.id}
-        });      
-            
-        uploader.init();    
-        $wnd.uploaders[uploaderKey] = uploader;    
+            uploader.bind('Destroy', function(up, files) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::destroy()();
+            });
 
+            uploader.bind('BeforeUpload', function (up, file) {
+                up.settings.multipart_params = {fileId: file.id}
+            });      
+
+            uploader.init();    
+            $wnd.uploaders[uploaderKey] = uploader;    
+        }
      }-*/;
     
     public static native void startUploader(String uploaderKey)
@@ -163,7 +168,7 @@ public class PluploadJSNIDelegate implements Serializable {
     public static native void removeFile(String uploaderKey, String fileId)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {    
             $wnd.uploaders[uploaderKey].removeFile($wnd.uploaders[uploaderKey].getFile(fileId));
        }   
     }-*/;

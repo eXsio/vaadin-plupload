@@ -49,6 +49,16 @@ public class PluploadQueue implements Serializable {
         this.queue = new LinkedHashMap<>();
     }
 
+    public void clear(boolean deleteFiles) {
+        for (String fileId : this.queue.keySet()) {
+            PluploadFile file = this.queue.get(fileId);
+            if (deleteFiles && file.getUploadedFile() != null) {
+                file.getUploadedFile().delete();
+            }
+        }
+        this.queue.clear();
+    }
+
     public void addFile(PluploadFile file, String uploadPath) {
         this.queue.put(file.getId(), file);
         PluploadReceiver.expectedFileIds.put(file.getId(), uploadPath);

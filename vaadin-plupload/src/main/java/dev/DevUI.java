@@ -126,12 +126,38 @@ public class DevUI extends UI {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Window w = new Window("modal");
-                Field f = createUploadField();
-                w.setContent(f);
+
+                final PluploadField f = createUploadField();
+                w.addCloseListener(new Window.CloseListener() {
+
+                    @Override
+                    public void windowClose(Window.CloseEvent e) {
+                        Notification.show("closed modal");
+                        f.getUploader().destroy();
+                    }
+                });
+                VerticalLayout lay = new VerticalLayout();
+                lay.addComponent(f);
+                lay.addComponent(new Button("destroy", new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        f.getUploader().destroy();
+                    }
+                }));
+                
+                w.setContent(lay);
                 w.setModal(true);
                 getUI().addWindow(w);
             }
         });
+
+        Accordion acc = new Accordion();
+        acc.addTab(this.createUploadManager("mgr3"), "uploader");
+        acc.addTab(new HorizontalLayout(), "Stub");
+
+        mainLayout.addComponent(acc);
+
         mainLayout.addComponent(modal);
         this.setContent(mainLayout);
 
@@ -222,8 +248,7 @@ public class DevUI extends UI {
                 System.out.println("This file was filtered: " + file.getName());
             }
         });
-        mgr.getUploader().setOption(PluploadOption.MAX_FILE_SIZE, "5mb");
-        mgr.getUploader().setOption(PluploadOption.MULTI_SELECTION, "true");
+
         return mgr;
     }
 
