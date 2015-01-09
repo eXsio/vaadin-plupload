@@ -210,6 +210,11 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
   
   As You see, the field is parametrized. Thanks to this, You can use it to get ```java.io.File``` or ```byte[]``` as a value/type of the field.
   
+  
+### Limitations
+
+ As all actions are controlled by client side, there are some limitations. If the uploader is in some kind of accordion/tabsheet/whatever and becomes invisible to the user, it becomes disabled for Vaadin and all RPC calls from it are ignored by the server side. This means that, even though file is uploaded by the Plupload library, the server side is not receiving any info about it and can't react to Pluploader's events. It won't see that the upload progress is completed and, when you request the files that were uploaded, the server side part won't know anything about them even though the files themselves were uploaded. That is because the file chunks are received by a custom Request Handler. When Plupload sends an event, that a file was uploaded, the concrete instance of server side uploader requests the file from the request handler. So obviously if the server side is unaware, that the upload progress was completed, it cannot request files from the request handler. As I've said this concers all of the events, that Pluploader sends. This is because the Plupload is the controlling (master) side, and the server components are the passive (slave) side. 
+  
 ---  
   
 ### Troubleshooting
