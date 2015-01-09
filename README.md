@@ -60,6 +60,7 @@ There are 3 main components in this add-on:
  - UploadProgress
  - UploadComplete
  - Error
+ - Destroy
  ```
   
   Example usage of the Plupload component:
