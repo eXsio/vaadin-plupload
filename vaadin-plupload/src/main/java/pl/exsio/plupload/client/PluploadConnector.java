@@ -40,7 +40,7 @@ import pl.exsio.plupload.client.shared.PluploadState;
  * @author exsio
  */
 @Connect(Plupload.class)
-public class PluploadConnector extends ButtonConnector implements AttachEvent.Handler {
+public class PluploadConnector extends ButtonConnector {
 
     protected final PluploadServerRpc serverRpc = RpcProxy.create(PluploadServerRpc.class, this);
 
@@ -50,7 +50,6 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
 
     public PluploadConnector() {
         this.registerRpc(PluploadCilentRpc.class, this.clientRpc);
-        this.getWidget().addAttachHandler(this);
         if (this.getState().uploaderKey != null) {
             this.attachUploader();
         }
@@ -140,13 +139,6 @@ public class PluploadConnector extends ButtonConnector implements AttachEvent.Ha
     @Override
     public PluploadState getState() {
         return (PluploadState) super.getState();
-    }
-
-    @Override
-    public void onAttachOrDetach(AttachEvent event) {
-        if (event.isAttached()) {
-            this.clientRpc.refresh();
-        }
     }
 
 }
