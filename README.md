@@ -14,7 +14,7 @@ In order to install, for now You have to download and compile the project, and t
 
 ---
 
-### Why is this add-on so damn cool?
+### Why is this add-on is worthy of Your interest?
 
 Well, there is a number of reasons, but the main ones are:
 - Live upload progress updates without any needs of Push dependencies or enabled asyncSupported feature.
@@ -219,3 +219,4 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
 ### Known Bugs
 
 - Due to some bug in original plupload library setting `multi_selection` to false doesn't take effect in the browser.
+- Sometimes the the listeners don't kick in unless user moves his mouse. This is because listeners are based on RPCs, and Vaadin decides, when to make UIDL requests. For some reason (at leas with valo theme) Vaadin waits with UIDL requestes for some user input (eg. mouse movement). I'll investigate this case some more and hopefully find some solution to this.
