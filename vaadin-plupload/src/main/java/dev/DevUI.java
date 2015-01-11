@@ -229,7 +229,7 @@ public class DevUI extends UI {
 
     private PluploadManager createUploadManager(final String name) {
         final PluploadManager mgr = new PluploadManager();
-        mgr.getUploader().setUploadPath("/home/exsio");
+        //mgr.getUploader().setUploadPath("/home/exsio");
         System.out.println("upload path for " + name + ": " + mgr.getUploader().getUploadPath());
         mgr.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 

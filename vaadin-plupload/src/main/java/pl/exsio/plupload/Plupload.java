@@ -113,6 +113,7 @@ public class Plupload extends Button {
     private void postConstruct() {
 
         getReceiver().bind();
+        this.setImmediate(true);
         this.getState().uploaderKey = this.uploaderKey;
         this.handleFilesAdded();
         this.handleFilesRemoved();
