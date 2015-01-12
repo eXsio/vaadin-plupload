@@ -38,8 +38,6 @@ public interface PluploadCilentRpc extends ClientRpc {
     void refresh();
 
     void disableBrowse(boolean disable);
-
-    void setOption(String name, String value);
     
     void removeFile(String fileId);
     

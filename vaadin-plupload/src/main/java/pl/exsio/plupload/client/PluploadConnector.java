@@ -33,7 +33,7 @@ import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
 import pl.exsio.plupload.Plupload;
-import pl.exsio.plupload.client.shared.PluploadState;
+import pl.exsio.plupload.shared.PluploadState;
 
 /**
  *
@@ -68,6 +68,41 @@ public class PluploadConnector extends ButtonConnector {
             }
         });
         this.getWidget().getElement().setAttribute("data-uploader-id", this.uploaderKey);
+    }
+
+    @OnStateChange("filters")
+    void setFilters() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "filters", this.getState().filters);
+    }
+
+    @OnStateChange("resize")
+    void setResize() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "resize", this.getState().resize);
+    }
+
+    @OnStateChange("chunkSize")
+    void setChunkSize() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "chunk_size", this.getState().chunkSize);
+    }
+
+    @OnStateChange("maxFileSize")
+    void setMaxFileSize() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "max_file_size", this.getState().maxFileSize);
+    }
+
+    @OnStateChange("maxRetries")
+    void setMaxRetries() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "max_retries", Integer.toString(this.getState().maxRetries));
+    }
+
+    @OnStateChange("multiSelection")
+    void setMultiSelection() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "multi_selection", Boolean.toString(this.getState().multiSelection));
+    }
+
+    @OnStateChange("preventDuplicates")
+    void setPreventDuplicates() {
+        PluploadJSNIDelegate.setOption(uploaderKey, "prevent_duplicates", Boolean.toString(this.getState().preventDuplicates));
     }
 
     private void fetchUploadTrigger() {
@@ -117,11 +152,6 @@ public class PluploadConnector extends ButtonConnector {
         @Override
         public void disableBrowse(boolean disable) {
             PluploadJSNIDelegate.disableBrowse(uploaderKey, disable);
-        }
-
-        @Override
-        public void setOption(String name, String value) {
-            PluploadJSNIDelegate.setOption(uploaderKey, name, value);
         }
 
         @Override

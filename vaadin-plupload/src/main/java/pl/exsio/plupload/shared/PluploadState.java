@@ -21,30 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload;
+package pl.exsio.plupload.shared;
+
+import com.vaadin.shared.ui.button.ButtonState;
 
 /**
  *
  * @author exsio
  */
-public enum PluploadOption {
+public class PluploadState extends ButtonState {
 
-    CHUNK_SIZE("chunk_size"),
-    FILTERS("filters"),
-    RESIZE("resize"),
-    MAX_FILE_SIZE("max_file_size"),
-    MAX_RETRIES("max_retries"),
-    MULTI_SELECTION("multi_selection"),
-    PREVENT_DUPLICATES("prevent_duplicates");
+    public String uploaderKey;
 
-    private final String optionName;
+    public String chunkSize = "1mb";
 
-    private PluploadOption(String optionName) {
-        this.optionName = optionName;
-    }
+    public String filters = "{}";
 
-    public String toString() {
-        return this.optionName;
-    }
+    public String resize = "{}";
+
+    public String maxFileSize = "1000mb";
+
+    public boolean preventDuplicates = false;
+
+    public boolean multiSelection = true;
+
+    public int maxRetries = 3;
 
 }

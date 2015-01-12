@@ -36,26 +36,26 @@ import java.util.List;
 public class PluploadFilters implements Serializable {
 
     @SerializedName("mime_types")
-    protected PluploadFilter[] mimeTypes = new PluploadFilter[0];
+    protected PluploadFilter[] filters = new PluploadFilter[0];
 
-    public PluploadFilter[] getMimeTypes() {
-        return mimeTypes;
+    public PluploadFilter[] get() {
+        return filters;
     }
 
-    public void setMimeTypes(PluploadFilter[] mimeTypes) {
-        this.mimeTypes = mimeTypes;
+    public void set(PluploadFilter[] filters) {
+        this.filters = filters;
     }
 
-    public void addMimeType(PluploadFilter mimeType) {
-        List<PluploadFilter> list = new ArrayList(Arrays.asList(mimeTypes));
-        list.add(mimeType);
-        this.mimeTypes = list.toArray(new PluploadFilter[list.size()]);
+    public void add(PluploadFilter filter) {
+        List<PluploadFilter> list = new ArrayList(Arrays.asList(filters));
+        list.add(filter);
+        this.filters = list.toArray(new PluploadFilter[list.size()]);
     }
 
-    public void removeMimeType(PluploadFilter mimeType) {
-        List<PluploadFilter> list = new ArrayList(Arrays.asList(mimeTypes));
-        list.remove(mimeType);
-        this.mimeTypes = list.toArray(new PluploadFilter[list.size()]);
+    public void remove(PluploadFilter filter) {
+        List<PluploadFilter> list = new ArrayList(Arrays.asList(filters));
+        list.remove(filter);
+        this.filters = list.toArray(new PluploadFilter[list.size()]);
     }
 
 }

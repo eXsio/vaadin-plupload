@@ -34,9 +34,9 @@ import javax.servlet.annotation.WebServlet;
 import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadError;
 import pl.exsio.plupload.PluploadFile;
-import pl.exsio.plupload.PluploadOption;
 import pl.exsio.plupload.field.PluploadField;
 import pl.exsio.plupload.helper.filter.PluploadFilter;
+import pl.exsio.plupload.helper.resize.PluploadImageResize;
 import pl.exsio.plupload.manager.PluploadManager;
 
 @SuppressWarnings("serial")
@@ -77,7 +77,7 @@ public class DevUI extends UI {
 
         mgr.getUploader().addFilter(new PluploadFilter("music", "mp3,flac"));
         mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
-        // mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
+         mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
 
         mainLayout.addComponent(mgr);
         mainLayout.addComponent(mgr2);
@@ -182,11 +182,11 @@ public class DevUI extends UI {
         //instantiate the uploader just as it was a norman Vaadin Button
         final Plupload uploader = new Plupload("Browse", FontAwesome.FILES_O);
         //set the maximum size of uploaded file
-        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "5mb");
+        uploader.setMaxFileSize("5mb");
         //prevent duplicate files
-        uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
+        uploader.setPreventDuplicates(true);
 
-        uploader.setOption(PluploadOption.MULTI_SELECTION, "false");
+        uploader.setMultiSelection(false);
         //add filter
         uploader.addFilter(new PluploadFilter("music", "mp3,flac"));
         //add file uploaded handler
@@ -246,7 +246,7 @@ public class DevUI extends UI {
 
             @Override
             public void onError(PluploadError error) {
-                Notification.show("Upload error: " + error.getMessage()+" - "+error.getFile().getType(), Notification.Type.ERROR_MESSAGE);
+                Notification.show("Upload error: " + error.getMessage() + " - " + error.getFile().getType(), Notification.Type.ERROR_MESSAGE);
             }
         });
         mgr.getUploader().addFileFilteredListener(new Plupload.FileFilteredListener() {
