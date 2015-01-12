@@ -21,32 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload.client;
+package pl.exsio.plupload;
 
-import com.vaadin.shared.communication.ServerRpc;
+import java.io.Serializable;
 
 /**
  *
  * @author exsio
  */
-public interface PluploadServerRpc extends ServerRpc {
+public class PluploadError implements Serializable {
 
-    void filesAdded(String json);
+    protected int code;
 
-    void uploadProgress(String json);
+    protected PluploadFile file;
 
-    void uploadComplete();
+    protected String message;
 
-    void filesRemoved(String json);
+    public int getCode() {
+        return code;
+    }
 
-    void fileUploaded(String json);
+    public void setCode(int code) {
+        this.code = code;
+    }
 
-    void error(String json);
+    public PluploadFile getFile() {
+        return file;
+    }
 
-    void fileFiltered(String json);
-    
-    void init();
-    
-    void destroy();
+    public void setFile(PluploadFile file) {
+        this.file = file;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
 }

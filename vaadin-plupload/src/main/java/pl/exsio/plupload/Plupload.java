@@ -218,9 +218,10 @@ public class Plupload extends Button {
         }
 
         @Override
-        public void error() {
+        public void error(String json) {
+            PluploadError error = new Gson().fromJson(json, PluploadError.class);
             for (ErrorListener listener : errorListeners) {
-                listener.onError();
+                listener.onError(error);
             }
         }
 
@@ -495,7 +496,7 @@ public class Plupload extends Button {
 
     public interface ErrorListener extends Serializable {
 
-        void onError();
+        void onError(PluploadError error);
     }
 
     public interface DestroyListener extends Serializable {

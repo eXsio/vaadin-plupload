@@ -32,6 +32,7 @@ import com.vaadin.ui.*;
 import java.io.File;
 import javax.servlet.annotation.WebServlet;
 import pl.exsio.plupload.Plupload;
+import pl.exsio.plupload.PluploadError;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.PluploadOption;
 import pl.exsio.plupload.field.PluploadField;
@@ -145,7 +146,7 @@ public class DevUI extends UI {
                         f.getUploader().destroy();
                     }
                 }));
-                
+
                 w.setContent(lay);
                 w.setModal(true);
                 getUI().addWindow(w);
@@ -239,6 +240,13 @@ public class DevUI extends UI {
                 for (PluploadFile file : mgr.getUploadedFiles()) {
                     System.out.println(file.getUploadedFile().getAbsolutePath());
                 }
+            }
+        });
+        mgr.getUploader().addErrorListener(new Plupload.ErrorListener() {
+
+            @Override
+            public void onError(PluploadError error) {
+                Notification.show("Upload error: " + error.getMessage()+" - "+error.getFile().getType(), Notification.Type.ERROR_MESSAGE);
             }
         });
         mgr.getUploader().addFileFilteredListener(new Plupload.FileFilteredListener() {

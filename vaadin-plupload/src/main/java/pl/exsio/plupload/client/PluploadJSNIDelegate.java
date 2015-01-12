@@ -82,22 +82,22 @@ public class PluploadJSNIDelegate implements Serializable {
                     forceRPCCall();
             });
 
-            uploader.bind('UploadComplete', function(up, files) {
+            uploader.bind('UploadComplete', function() {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadComplete()();
                     forceRPCCall();
             });
 
-            uploader.bind('Error', function(up, files) {
-                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::error()();
+            uploader.bind('Error', function(up, error) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::error(Ljava/lang/String;)(JSON.stringify(error));
                     forceRPCCall();
             });
             
-            uploader.bind('Destroy', function(up, files) {
+            uploader.bind('Destroy', function() {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::destroy()();
                     forceRPCCall();
             });
             
-            uploader.bind('Init', function(up, files) {
+            uploader.bind('Init', function() {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::init()();
                     forceRPCCall();
             });
