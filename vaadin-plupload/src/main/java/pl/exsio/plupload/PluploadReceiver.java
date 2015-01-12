@@ -45,6 +45,12 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 public class PluploadReceiver implements RequestHandler, Serializable {
 
+    protected static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
+
+    protected static final Map<String, String> expectedFileIds = Collections.synchronizedMap(new HashMap());
+
+    protected final Map<String, File> uploadedFiles = Collections.synchronizedMap(new HashMap());
+
     private static class ReceiverHolder {
 
         private final static PluploadReceiver instance = new PluploadReceiver();
@@ -54,14 +60,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
         return ReceiverHolder.instance;
     }
 
-    protected static final Map<String, String> expectedFileIds = Collections.synchronizedMap(new HashMap());
-
-    protected static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
-
-    protected final Map<String, File> uploadedFiles;
-
     private PluploadReceiver() {
-        this.uploadedFiles = new HashMap<>();
     }
 
     public void bind() {
@@ -71,7 +70,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
         }
     }
 
-    public File retrieveUploadedFile(String fileId) {
+    public synchronized File retrieveUploadedFile(String fileId) {
         if (this.uploadedFiles.containsKey(fileId)) {
             File file = this.uploadedFiles.get(fileId);
             this.uploadedFiles.remove(fileId);
@@ -83,7 +82,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
     }
 
     @Override
-    public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
+    public synchronized boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
         if (UPLOAD_ACTION_PATH.equals(request.getPathInfo().replaceAll("/", ""))) {
             if (request instanceof VaadinServletRequest) {
                 VaadinServletRequest vsr = (VaadinServletRequest) request;
