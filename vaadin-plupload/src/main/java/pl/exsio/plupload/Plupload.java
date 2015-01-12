@@ -51,28 +51,6 @@ import pl.exsio.plupload.helper.resize.PluploadImageResize;
 })
 public class Plupload extends Button {
 
-    protected final Set<FilesAddedListener> filesAddedListeners = new LinkedHashSet<>();
-
-    protected final Set<UploadProgressListener> uploadProgressListeners = new LinkedHashSet<>();
-
-    protected final Set<FilesRemovedListener> filesRemovedListeners = new LinkedHashSet<>();
-
-    protected final Set<FileFilteredListener> fileFilteredListeners = new LinkedHashSet<>();
-
-    protected final Set<FileUploadedListener> fileUploadedListeners = new LinkedHashSet<>();
-
-    protected final Set<ErrorListener> errorListeners = new LinkedHashSet<>();
-
-    protected final Set<DestroyListener> destroyListeners = new LinkedHashSet<>();
-
-    protected final Set<InitListener> initListeners = new LinkedHashSet<>();
-
-    protected final Set<UploadStartListener> uploadStartListeners = new LinkedHashSet<>();
-
-    protected final Set<UploadStopListener> uploadStopListeners = new LinkedHashSet<>();
-
-    protected final Set<UploadCompleteListener> uploadCompleteListeners = new LinkedHashSet<>();
-
     protected boolean uploadStarted = false;
 
     protected final PluploadQueue queue = new PluploadQueue();
@@ -344,6 +322,28 @@ public class Plupload extends Button {
     protected PluploadCilentRpc getClient() {
         return this.getRpcProxy(PluploadCilentRpc.class);
     }
+
+    private final Set<FilesAddedListener> filesAddedListeners = new LinkedHashSet<>();
+
+    private final Set<UploadProgressListener> uploadProgressListeners = new LinkedHashSet<>();
+
+    private final Set<FilesRemovedListener> filesRemovedListeners = new LinkedHashSet<>();
+
+    private final Set<FileFilteredListener> fileFilteredListeners = new LinkedHashSet<>();
+
+    private final Set<FileUploadedListener> fileUploadedListeners = new LinkedHashSet<>();
+
+    private final Set<ErrorListener> errorListeners = new LinkedHashSet<>();
+
+    private final Set<DestroyListener> destroyListeners = new LinkedHashSet<>();
+
+    private final Set<InitListener> initListeners = new LinkedHashSet<>();
+
+    private final Set<UploadStartListener> uploadStartListeners = new LinkedHashSet<>();
+
+    private final Set<UploadStopListener> uploadStopListeners = new LinkedHashSet<>();
+
+    private final Set<UploadCompleteListener> uploadCompleteListeners = new LinkedHashSet<>();
 
     public Plupload addFilesAddedListener(FilesAddedListener listener) {
         this.filesAddedListeners.add(listener);
