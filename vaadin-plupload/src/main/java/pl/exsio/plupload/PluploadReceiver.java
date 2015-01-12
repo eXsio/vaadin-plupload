@@ -82,23 +82,23 @@ public class PluploadReceiver implements RequestHandler, Serializable {
     }
 
     @Override
-    public synchronized boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
+    public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
         if (UPLOAD_ACTION_PATH.equals(request.getPathInfo().replaceAll("/", ""))) {
             if (request instanceof VaadinServletRequest) {
                 VaadinServletRequest vsr = (VaadinServletRequest) request;
                 HttpServletRequest req = vsr.getHttpServletRequest();
                 if (ServletFileUpload.isMultipartContent(req)) {
                     try {
-
-                        ServletFileUpload upload = new ServletFileUpload();
-                        FileItemIterator items = upload.getItemIterator(req);
-                        PluploadChunk chunk = PluploadAppender.appendData(items);
-
-                        if (chunk.isLast()) {
-                            this.uploadedFiles.put(chunk.getFileId(), chunk.getFile());
-                            response.getWriter().append("file " + chunk.getName() + " uploaded successfuly");
-                        } else {
-                            response.getWriter().append("file chunk " + (chunk.getChunk() + 1) + " of " + chunk.getChunks() + " uploaded successfuly");
+                        synchronized (this) {
+                            ServletFileUpload upload = new ServletFileUpload();
+                            FileItemIterator items = upload.getItemIterator(req);
+                            PluploadChunk chunk = PluploadAppender.appendData(items);
+                            if (chunk.isLast()) {
+                                this.uploadedFiles.put(chunk.getFileId(), chunk.getFile());
+                                response.getWriter().append("file " + chunk.getName() + " uploaded successfuly");
+                            } else {
+                                response.getWriter().append("file chunk " + (chunk.getChunk() + 1) + " of " + chunk.getChunks() + " uploaded successfuly");
+                            }
                         }
                         response.setContentType("text/plain");
                     } catch (FileUploadException ex) {
