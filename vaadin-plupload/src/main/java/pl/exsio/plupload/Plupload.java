@@ -65,6 +65,8 @@ public class Plupload extends Button {
 
     protected final Set<DestroyListener> destroyListeners = new LinkedHashSet<>();
 
+    protected final Set<InitListener> initListeners = new LinkedHashSet<>();
+
     protected final Set<UploadStartListener> uploadStartListeners = new LinkedHashSet<>();
 
     protected final Set<UploadStopListener> uploadStopListeners = new LinkedHashSet<>();
@@ -236,6 +238,13 @@ public class Plupload extends Button {
                 listener.onDestroy();
             }
         }
+
+        @Override
+        public void init() {
+            for (InitListener listener : initListeners) {
+                listener.onInit();
+            }
+        }
     };
 
     public Plupload disableBrowse(boolean disable) {
@@ -384,6 +393,11 @@ public class Plupload extends Button {
         return this;
     }
 
+    public Plupload addInitListener(InitListener listener) {
+        this.initListeners.add(listener);
+        return this;
+    }
+
     public Plupload removeFilesAddedListener(FilesAddedListener listener) {
         this.filesAddedListeners.remove(listener);
         return this;
@@ -426,6 +440,11 @@ public class Plupload extends Button {
 
     public Plupload removeErrorListener(ErrorListener listener) {
         this.errorListeners.remove(listener);
+        return this;
+    }
+
+    public Plupload removeInitListener(InitListener listener) {
+        this.initListeners.remove(listener);
         return this;
     }
 
@@ -482,5 +501,10 @@ public class Plupload extends Button {
     public interface DestroyListener extends Serializable {
 
         void onDestroy();
+    }
+
+    public interface InitListener extends Serializable {
+
+        void onInit();
     }
 }

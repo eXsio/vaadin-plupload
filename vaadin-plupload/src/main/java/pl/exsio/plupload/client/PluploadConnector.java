@@ -23,10 +23,10 @@
  */
 package pl.exsio.plupload.client;
 
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.user.client.DOM;
 import com.vaadin.client.annotations.OnStateChange;
 import com.vaadin.client.communication.RpcProxy;
@@ -89,6 +89,17 @@ public class PluploadConnector extends ButtonConnector {
         trigger.setAttribute("id", triggerId);
         trigger.setAttribute("style", "display:none;");
         return trigger;
+    }
+
+    /**
+     * This is a hack to force the RPC call. This is done, because if the upload
+     * progress isn't immediate, the client side of Vaadin sends RPC updates
+     * only after user input (mouse move or keypress). If I'll find a better way
+     * to handle this, I'll change it, but for now it has to be this way
+     */
+    public static void forceRPCCall() {
+        Document doc = Document.get();
+        doc.getBody().dispatchEvent(doc.createMouseMoveEvent(0, 0, 0, 0, 0, false, false, false, false, 0));
     }
 
     protected PluploadCilentRpc clientRpc = new PluploadCilentRpc() {

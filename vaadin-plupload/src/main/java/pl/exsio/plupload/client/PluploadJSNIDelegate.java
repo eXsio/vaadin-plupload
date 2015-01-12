@@ -51,37 +51,55 @@ public class PluploadJSNIDelegate implements Serializable {
                 multi_selection: true,
                 multipart: true
             });
+            
+
+            var forceRPCCall = function() {
+                @pl.exsio.plupload.client.PluploadConnector::forceRPCCall()();
+            };
 
             uploader.bind('FilesAdded', function(up, files) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesAdded(Ljava/lang/String;)(JSON.stringify(files));
+                    forceRPCCall();
             });
 
             uploader.bind('FilesRemoved', function(up, files) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesRemoved(Ljava/lang/String;)(JSON.stringify(files));
+                    forceRPCCall();
             });
 
             uploader.bind('FileFiltered', function(up, file) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileFiltered(Ljava/lang/String;)(JSON.stringify(file));
+                    forceRPCCall();
             });
 
             uploader.bind('FileUploaded', function(up, file) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileUploaded(Ljava/lang/String;)(JSON.stringify(file));
+                    forceRPCCall();
             });
 
             uploader.bind('UploadProgress', function(up, file) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadProgress(Ljava/lang/String;)(JSON.stringify(file));
+                    forceRPCCall();
             });
 
             uploader.bind('UploadComplete', function(up, files) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadComplete()();
+                    forceRPCCall();
             });
 
             uploader.bind('Error', function(up, files) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::error()();
+                    forceRPCCall();
             });
             
             uploader.bind('Destroy', function(up, files) {
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::destroy()();
+                    forceRPCCall();
+            });
+            
+            uploader.bind('Init', function(up, files) {
+                    rpc.@pl.exsio.plupload.client.PluploadServerRpc::init()();
+                    forceRPCCall();
             });
 
             uploader.bind('BeforeUpload', function (up, file) {

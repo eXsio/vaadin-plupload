@@ -50,7 +50,6 @@ public class PluploadAppender implements Serializable {
                 saveChunkData(chunk, item);
             }
         }
-
         return chunk;
     }
 
