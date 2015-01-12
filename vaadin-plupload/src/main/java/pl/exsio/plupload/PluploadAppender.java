@@ -37,7 +37,7 @@ import org.apache.commons.fileupload.util.Streams;
  *
  * @author exsio
  */
-public class PluploadAppender implements Serializable {
+public abstract class PluploadAppender implements Serializable {
 
     public static PluploadChunk appendData(FileItemIterator items) throws IOException, FileUploadException {
         PluploadChunk chunk = new PluploadChunk();
@@ -71,17 +71,20 @@ public class PluploadAppender implements Serializable {
     }
 
     private static void saveChunkData(PluploadChunk chunk, FileItemStream item) throws IOException {
-        if (PluploadReceiver.expectedFileIds.containsKey(chunk.getFileId())) {
+        if (getReceiver().isFileExpected(chunk.getFileId())) {
             String uploadedFileName = getFileName(chunk);
-            String filePath = PluploadReceiver.expectedFileIds.get(chunk.getFileId()) + File.separator + uploadedFileName;
-            InputStream input = item.openStream();
-            try (FileOutputStream output = new FileOutputStream(filePath, true)) {
+            String filePath = getFilePath(chunk, uploadedFileName);
+            try (InputStream input = item.openStream();
+                    FileOutputStream output = new FileOutputStream(filePath, true)) {
                 copyInputStreamToOutputStream(input, output);
                 output.close();
             }
-            input.close();
             chunk.setFile(new File(filePath));
         }
+    }
+
+    private static String getFilePath(PluploadChunk chunk, String uploadedFileName) {
+        return getReceiver().getExpectedFilePath(chunk.getFileId()) + File.separator + uploadedFileName;
     }
 
     private static void copyInputStreamToOutputStream(InputStream input, final FileOutputStream output) throws IOException {

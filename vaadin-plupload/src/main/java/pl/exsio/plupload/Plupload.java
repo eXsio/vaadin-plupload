@@ -75,9 +75,11 @@ public class Plupload extends Button {
 
     protected boolean uploadStarted = false;
 
-    protected final transient PluploadQueue queue = new PluploadQueue();
+    protected final PluploadQueue queue = new PluploadQueue();
 
-    protected final transient PluploadFilters filters = new PluploadFilters();
+    protected final PluploadFilters filters = new PluploadFilters();
+
+    protected final PluploadReceiver receiver = PluploadReceiver.getInstance();
 
     protected PluploadImageResize imageResize = new PluploadImageResize();
 
@@ -114,7 +116,6 @@ public class Plupload extends Button {
 
     private void postConstruct() {
 
-        getReceiver().bind();
         this.setImmediate(true);
         this.getState().uploaderKey = this.uploaderKey;
         this.handleFilesAdded();

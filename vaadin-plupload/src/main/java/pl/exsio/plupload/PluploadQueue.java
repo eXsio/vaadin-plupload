@@ -61,7 +61,7 @@ public class PluploadQueue implements Serializable {
 
     public void addFile(PluploadFile file, String uploadPath) {
         this.queue.put(file.getId(), file);
-        PluploadReceiver.expectedFileIds.put(file.getId(), uploadPath);
+        getReceiver().addExpectedFile(file.getId(), uploadPath);
     }
 
     public void addFiles(PluploadFile[] files, String uploadPath) {
@@ -73,7 +73,7 @@ public class PluploadQueue implements Serializable {
     public void removeFile(String fileId) {
         if (this.queue.containsKey(fileId)) {
             this.queue.remove(fileId);
-            PluploadReceiver.expectedFileIds.remove(fileId);
+            getReceiver().removeExpectedFile(fileId);
         }
     }
 
@@ -119,6 +119,10 @@ public class PluploadQueue implements Serializable {
             }
         }
         return files;
+    }
+
+    protected static PluploadReceiver getReceiver() {
+        return PluploadReceiver.getInstance();
     }
 
 }

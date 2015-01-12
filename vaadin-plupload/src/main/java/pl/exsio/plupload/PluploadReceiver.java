@@ -45,29 +45,26 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 public class PluploadReceiver implements RequestHandler, Serializable {
 
-    protected static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
+    public static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
 
-    protected static final Map<String, String> expectedFileIds = Collections.synchronizedMap(new HashMap());
+    private final Map<String, String> expectedFileIds = Collections.synchronizedMap(new HashMap());
 
-    protected final Map<String, File> uploadedFiles = Collections.synchronizedMap(new HashMap());
-
-    private static class ReceiverHolder {
-
-        private final static PluploadReceiver instance = new PluploadReceiver();
-    }
-
-    protected static PluploadReceiver getInstance() {
-        return ReceiverHolder.instance;
-    }
+    private final Map<String, File> uploadedFiles = Collections.synchronizedMap(new HashMap());
 
     private PluploadReceiver() {
     }
 
-    public void bind() {
+    public static PluploadReceiver getInstance() {
         VaadinSession session = VaadinSession.getCurrent();
-        if (!session.getRequestHandlers().contains(getInstance())) {
-            session.addRequestHandler(getInstance());
+        for (RequestHandler handler : session.getRequestHandlers()) {
+            if (handler instanceof PluploadReceiver) {
+                return (PluploadReceiver) handler;
+            }
         }
+
+        PluploadReceiver receiver = new PluploadReceiver();
+        session.addRequestHandler(receiver);
+        return receiver;
     }
 
     public synchronized File retrieveUploadedFile(String fileId) {
@@ -111,6 +108,30 @@ public class PluploadReceiver implements RequestHandler, Serializable {
         }
         return false;
 
+    }
+
+    public String getExpectedFilePath(String fileId) {
+        if (this.isFileExpected(fileId)) {
+            return this.expectedFileIds.get(fileId);
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isFileExpected(String fileId) {
+        return this.expectedFileIds.containsKey(fileId);
+    }
+
+    public void addExpectedFile(String fileId, String path) {
+        this.expectedFileIds.put(fileId, path);
+    }
+
+    public void removeExpectedFile(String fileId) {
+        this.expectedFileIds.remove(fileId);
+    }
+
+    protected Map<String, File> getUploadedFiles() {
+        return uploadedFiles;
     }
 
 }
