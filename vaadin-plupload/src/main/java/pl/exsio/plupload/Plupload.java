@@ -102,10 +102,6 @@ public class Plupload extends Button {
         this.handleUploadComplete();
     }
 
-    protected static PluploadReceiver getReceiver() {
-        return PluploadReceiver.getInstance();
-    }
-
     private void handleUploadComplete() {
         this.addUploadCompleteListener(new UploadCompleteListener() {
 
@@ -121,7 +117,7 @@ public class Plupload extends Button {
 
             @Override
             public void onFileUploaded(PluploadFile file) {
-                File uploadedFile = getReceiver().retrieveUploadedFile(file.getId());
+                File uploadedFile = receiver.retrieveUploadedFile(file.getId());
                 if (uploadedFile != null) {
                     queue.setUploadedFile(file.getId(), uploadedFile);
                     file.setUploadedFile(uploadedFile);
@@ -274,7 +270,6 @@ public class Plupload extends Button {
             this.uploadStarted = true;
         }
         return this;
-
     }
 
     public Plupload refresh() {
@@ -316,7 +311,6 @@ public class Plupload extends Button {
             this.uploadStarted = false;
         }
         return this;
-
     }
 
     protected PluploadCilentRpc getClient() {
