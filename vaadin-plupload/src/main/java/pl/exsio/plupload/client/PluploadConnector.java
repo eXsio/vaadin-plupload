@@ -68,6 +68,17 @@ public class PluploadConnector extends ButtonConnector {
             }
         });
         this.getWidget().getElement().setAttribute("data-uploader-id", this.uploaderKey);
+        this.setOptions();
+    }
+    
+    private void setOptions() {
+        this.setFilters();
+        this.setResize();
+        this.setChunkSize();
+        this.setMaxFileSize();
+        this.setMaxRetries();
+        this.setMultiSelection();
+        this.setPreventDuplicates();
     }
 
     @OnStateChange("filters")
