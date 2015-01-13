@@ -30,7 +30,7 @@ import java.io.Serializable;
  *
  * @author exsio
  */
-public class PluploadJSNIDelegate implements Serializable {
+public abstract class PluploadJSNIDelegate implements Serializable {
 
     public static native void click(Element button) 
     /*-{    
@@ -41,6 +41,7 @@ public class PluploadJSNIDelegate implements Serializable {
     /*-{
         $wnd.uploaders = $wnd.uploaders || {};
         if(typeof $wnd.uploaders[uploaderKey] === 'undefined') {
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('creating uploader "'+uploaderKey+'"');
             var uploader = new $wnd.plupload.Uploader({
                 browse_button: button,
                 url: 'pluploader-upload-action',
@@ -58,46 +59,55 @@ public class PluploadJSNIDelegate implements Serializable {
             };
 
             uploader.bind('FilesAdded', function(up, files) {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('files have been added to uploader "'+uploaderKey+'"');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesAdded(Ljava/lang/String;)(JSON.stringify(files));
                     forceRPCCall();
             });
 
             uploader.bind('FilesRemoved', function(up, files) {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('files have been removed from uploader "'+uploaderKey+'"');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::filesRemoved(Ljava/lang/String;)(JSON.stringify(files));
                     forceRPCCall();
             });
 
             uploader.bind('FileFiltered', function(up, file) {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('files have been filtered in uploader "'+uploaderKey+'"');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileFiltered(Ljava/lang/String;)(JSON.stringify(file));
                     forceRPCCall();
             });
 
             uploader.bind('FileUploaded', function(up, file) {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('file "'+file.id+'" has been uploaded in uploader "'+uploaderKey+'"');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::fileUploaded(Ljava/lang/String;)(JSON.stringify(file));
                     forceRPCCall();
             });
 
             uploader.bind('UploadProgress', function(up, file) {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('there was an upload progress in uploader "'+uploaderKey+'", fileId: "'+file.id+'", progress: '+file.percent+'%');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadProgress(Ljava/lang/String;)(JSON.stringify(file));
                     forceRPCCall();
             });
 
             uploader.bind('UploadComplete', function() {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('upload was completed in uploader "'+uploaderKey+'"');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::uploadComplete()();
                     forceRPCCall();
             });
 
             uploader.bind('Error', function(up, error) {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('there was an error in uploader "'+uploaderKey+'": '+error.message);
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::error(Ljava/lang/String;)(JSON.stringify(error));
                     forceRPCCall();
             });
             
             uploader.bind('Destroy', function() {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('uploader "'+uploaderKey+'" was destroyed');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::destroy()();
                     forceRPCCall();
             });
             
             uploader.bind('Init', function() {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('uploader "'+uploaderKey+'" was initialized');
                     rpc.@pl.exsio.plupload.client.PluploadServerRpc::init()();
                     forceRPCCall();
             });
@@ -114,7 +124,8 @@ public class PluploadJSNIDelegate implements Serializable {
     public static native void startUploader(String uploaderKey)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('starting uploader "'+uploaderKey+'"');
             $wnd.uploaders[uploaderKey].start();
        }
     }-*/;
@@ -123,6 +134,7 @@ public class PluploadJSNIDelegate implements Serializable {
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
        if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('stopping uploader "'+uploaderKey+'"');
             $wnd.uploaders[uploaderKey].stop();
        }
             
@@ -132,6 +144,7 @@ public class PluploadJSNIDelegate implements Serializable {
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
        if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('refreshing uploader "'+uploaderKey+'"');
             $wnd.uploaders[uploaderKey].refresh();
        }
             
@@ -141,6 +154,7 @@ public class PluploadJSNIDelegate implements Serializable {
     /*-{
        $wnd.uploaders = $wnd.uploaders || {}; 
        if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('Toggling uploader "'+uploaderKey+'"');
             $wnd.uploaders[uploaderKey].disableBrowse(disable);
        }    
     }-*/;
@@ -177,8 +191,7 @@ public class PluploadJSNIDelegate implements Serializable {
                     optionValue = value;
                  }   
             }
-            console.log('Setting uploader "'+uploaderKey+'" option "'+name+'":');
-            console.log(optionValue);
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('Setting uploader "'+uploaderKey+'" option "'+name+'": '+value);
             $wnd.uploaders[uploaderKey].setOption(name, optionValue);
        }
     }-*/;
@@ -186,8 +199,12 @@ public class PluploadJSNIDelegate implements Serializable {
     public static native void removeFile(String uploaderKey, String fileId)
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
-       if(typeof $wnd.uploaders[uploaderKey] === 'object') {    
-            $wnd.uploaders[uploaderKey].removeFile($wnd.uploaders[uploaderKey].getFile(fileId));
+       if(typeof $wnd.uploaders[uploaderKey] === 'object') {
+            var file = $wnd.uploaders[uploaderKey].getFile(fileId);
+            if(typeof file !=='undefined') {
+                @com.vaadin.client.VConsole::log(Ljava/lang/String;)('removing uploader "'+uploaderKey+'" file "'+fileId+'"');
+                $wnd.uploaders[uploaderKey].removeFile(file);
+            }
        }   
     }-*/;
     
@@ -196,6 +213,7 @@ public class PluploadJSNIDelegate implements Serializable {
     /*-{
        $wnd.uploaders = $wnd.uploaders || {};
        if(typeof $wnd.uploaders[uploaderKey] === 'object') {     
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('destroying uploader "'+uploaderKey+'"');
             $wnd.uploaders[uploaderKey].destroy();
             delete $wnd.uploaders[uploaderKey];
        }   
