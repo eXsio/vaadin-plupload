@@ -37,7 +37,7 @@ public abstract class PluploadJSNIDelegate implements Serializable {
             button.click();
     }-*/;
     
-    public static native void createUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
+    public static native void attachUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
     /*-{
         $wnd.uploaders = $wnd.uploaders || {};
         if(typeof $wnd.uploaders[uploaderKey] === 'undefined') {
@@ -118,6 +118,8 @@ public abstract class PluploadJSNIDelegate implements Serializable {
 
             uploader.init();    
             $wnd.uploaders[uploaderKey] = uploader;    
+        } else {
+            @com.vaadin.client.VConsole::log(Ljava/lang/String;)('attaching previously initialized uploader "'+uploaderKey+'"');
         }
      }-*/;
     
@@ -204,6 +206,8 @@ public abstract class PluploadJSNIDelegate implements Serializable {
             if(typeof file !=='undefined') {
                 @com.vaadin.client.VConsole::log(Ljava/lang/String;)('removing uploader "'+uploaderKey+'" file "'+fileId+'"');
                 $wnd.uploaders[uploaderKey].removeFile(file);
+            } else {
+                @com.vaadin.client.VConsole::error(Ljava/lang/String;)('Couldn\'t find file "'+fileId+'" in uploader "'+uploaderKey+'"');
             }
        }   
     }-*/;

@@ -60,7 +60,7 @@ public class PluploadConnector extends ButtonConnector {
         this.uploaderKey = this.getState().uploaderKey;
         this.fetchUploadTrigger();
         getWidget().getElement().getOwnerDocument().getBody().appendChild(this.uploadTrigger);
-        PluploadJSNIDelegate.createUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey);
+        PluploadJSNIDelegate.attachUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey);
         getWidget().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -68,52 +68,6 @@ public class PluploadConnector extends ButtonConnector {
             }
         });
         this.getWidget().getElement().setAttribute("data-uploader-id", this.uploaderKey);
-        this.setOptions();
-    }
-    
-    private void setOptions() {
-        this.setFilters();
-        this.setResize();
-        this.setChunkSize();
-        this.setMaxFileSize();
-        this.setMaxRetries();
-        this.setMultiSelection();
-        this.setPreventDuplicates();
-    }
-
-    @OnStateChange("filters")
-    void setFilters() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "filters", this.getState().filters);
-    }
-
-    @OnStateChange("resize")
-    void setResize() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "resize", this.getState().resize);
-    }
-
-    @OnStateChange("chunkSize")
-    void setChunkSize() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "chunk_size", this.getState().chunkSize);
-    }
-
-    @OnStateChange("maxFileSize")
-    void setMaxFileSize() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "max_file_size", this.getState().maxFileSize);
-    }
-
-    @OnStateChange("maxRetries")
-    void setMaxRetries() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "max_retries", Integer.toString(this.getState().maxRetries));
-    }
-
-    @OnStateChange("multiSelection")
-    void setMultiSelection() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "multi_selection", Boolean.toString(this.getState().multiSelection));
-    }
-
-    @OnStateChange("preventDuplicates")
-    void setPreventDuplicates() {
-        PluploadJSNIDelegate.setOption(uploaderKey, "prevent_duplicates", Boolean.toString(this.getState().preventDuplicates));
     }
 
     private void fetchUploadTrigger() {
@@ -179,6 +133,11 @@ public class PluploadConnector extends ButtonConnector {
         public void destroy() {
             PluploadJSNIDelegate.destroyUploader(uploaderKey);
             getWidget().getElement().getOwnerDocument().getBody().removeChild(uploadTrigger);
+        }
+
+        @Override
+        public void setOption(String name, String value) {
+            PluploadJSNIDelegate.setOption(uploaderKey, name, value);
         }
 
     };

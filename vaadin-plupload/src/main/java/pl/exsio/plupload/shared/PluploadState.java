@@ -31,20 +31,6 @@ import com.vaadin.shared.ui.button.ButtonState;
  */
 public class PluploadState extends ButtonState {
 
-    public String uploaderKey;
-
-    public String chunkSize = "1mb";
-
-    public String filters = "{}";
-
-    public String resize = "{}";
-
-    public String maxFileSize = "1000mb";
-
-    public boolean preventDuplicates = false;
-
-    public boolean multiSelection = true;
-
-    public int maxRetries = 3;
+    public String uploaderKey = null;
 
 }

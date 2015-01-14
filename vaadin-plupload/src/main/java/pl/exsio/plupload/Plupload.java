@@ -60,6 +60,20 @@ public class Plupload extends Button {
 
     protected String uploadPath = System.getProperty("java.io.tmpdir");
 
+    protected final PluploadFilters filters = new PluploadFilters();
+
+    protected PluploadImageResize resize = new PluploadImageResize();
+
+    protected String chunkSize = "1mb";
+
+    protected String maxFileSize = "1000mb";
+
+    protected boolean multiSelection = true;
+
+    protected boolean preventDuplicates = false;
+
+    protected int maxRetries = 3;
+
     protected final String uploaderKey = DigestUtils.md2Hex(
             new Random().nextInt(Integer.MAX_VALUE)
             + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())
@@ -87,6 +101,27 @@ public class Plupload extends Button {
         super(caption, icon);
         this.registerRpc(serverRpc);
         this.postConstruct();
+    }
+
+    protected enum Option {
+
+        RESIZE("resize"),
+        FILTERS("filters"),
+        MAX_RETRIES("max_retries"),
+        MULTI_SELECTION("multi_selection"),
+        PREVENT_DUPLICATES("prevent_duplicates"),
+        CHUNK_SIZE("chunk_size"),
+        MAX_FILE_SIZE("max_file_size");
+
+        private String name;
+
+        private Option(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return this.name;
+        }
     }
 
     private void postConstruct() {
@@ -231,75 +266,79 @@ public class Plupload extends Button {
     }
 
     public Plupload addFilter(PluploadFilter filter) {
-        PluploadFilters filters = new Gson().fromJson(this.getState().filters, PluploadFilters.class);
-        filters.add(filter);
-        this.getState().filters = new Gson().toJson(filters);
+        this.filters.add(filter);
+        this.getClient().setOption(Option.FILTERS.toString(), new Gson().toJson(this.filters));
         return this;
     }
 
     public Plupload removeFilter(PluploadFilter filter) {
-        PluploadFilters filters = new Gson().fromJson(this.getState().filters, PluploadFilters.class);
-        filters.remove(filter);
-        this.getState().filters = new Gson().toJson(filters);
+        this.filters.remove(filter);
+        this.getClient().setOption(Option.FILTERS.toString(), new Gson().toJson(this.filters));
         return this;
     }
 
     public PluploadFilter[] getFilters() {
-        return new Gson().fromJson(this.getState().filters, PluploadFilters.class).get();
+        return this.filters.get();
     }
 
     public PluploadImageResize getImageResize() {
-        return new Gson().fromJson(this.getState().resize, PluploadImageResize.class);
+        return this.resize;
     }
 
     public Plupload setImageResize(PluploadImageResize resize) {
-        this.getState().resize = new Gson().toJson(resize);
+        this.resize = resize;
+        this.getClient().setOption(Option.RESIZE.toString(), new Gson().toJson(resize));
         return this;
     }
 
     public Plupload setChunkSize(String chunkSize) {
-        this.getState().chunkSize = chunkSize;
+        this.chunkSize = chunkSize;
+        this.getClient().setOption(Option.CHUNK_SIZE.toString(), chunkSize);
         return this;
     }
 
     public String getChunkSize() {
-        return this.getState().chunkSize;
+        return this.chunkSize;
     }
 
     public Plupload setMaxFileSize(String maxFileSize) {
-        this.getState().maxFileSize = maxFileSize;
+        this.maxFileSize = maxFileSize;
+        this.getClient().setOption(Option.MAX_FILE_SIZE.toString(), maxFileSize);
         return this;
     }
 
     public String getMaxFileSize() {
-        return this.getState().maxFileSize;
+        return this.maxFileSize;
     }
 
     public boolean isPreventDuplicates() {
-        return this.getState().preventDuplicates;
+        return this.preventDuplicates;
     }
 
     public Plupload setPreventDuplicates(boolean prevent) {
-        this.getState().preventDuplicates = prevent;
+        this.preventDuplicates = prevent;
+        this.getClient().setOption(Option.PREVENT_DUPLICATES.toString(), Boolean.toString(prevent));
         return this;
     }
 
     public Plupload setMaxRetries(int maxRetries) {
-        this.getState().maxRetries = maxRetries;
+        this.maxRetries = maxRetries;
+        this.getClient().setOption(Option.MAX_RETRIES.toString(), Integer.toString(maxRetries));
         return this;
     }
 
     public int getMaxRetries() {
-        return this.getState().maxRetries;
+        return this.maxRetries;
     }
 
     public Plupload setMultiSelection(boolean multiSelection) {
-        this.getState().multiSelection = multiSelection;
+        this.multiSelection = multiSelection;
+        this.getClient().setOption(Option.MULTI_SELECTION.toString(), Boolean.toString(multiSelection));
         return this;
     }
 
     public boolean isMultiSelection() {
-        return this.getState().multiSelection;
+        return this.multiSelection;
     }
 
     public Plupload start() {
