@@ -14,7 +14,19 @@ You can find a working examples here: http://vaadin-plupload.jelastic.servint.ne
 
 ### Installation
 
-In order to install, for now You have to download and compile the project, and then add it to the dependencies manually. Maven artifact will be availabie soon.
+You can install it using Maven:
+```
+<dependency>
+   <groupId>pl.exsio</groupId>
+   <artifactId>plupload-vaadin</artifactId>
+   <version>1.4.1</version>
+</dependency>
+
+<repository>
+   <id>vaadin-addons</id>
+   <url>http://maven.vaadin.com/vaadin-addons</url>
+</repository>
+```
 
 ---
 
