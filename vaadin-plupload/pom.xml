@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>pl.exsio</groupId>
-    <artifactId>vaadin-plupload</artifactId>
-    <version>1.4.1-SNAPSHOT</version>
+    <artifactId>plupload-vaadin</artifactId>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -11,6 +11,8 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         <vaadin.version>7.3.7</vaadin.version>
     </properties>
+    
+    <name>vaadin-plupload</name>
     
     <dependencies>
         <dependency>
@@ -99,7 +101,7 @@
                     <archive>
                         <manifestEntries>
                             <Vaadin-Package-Version>1</Vaadin-Package-Version>
-                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Title>Plupload wrapper for Vaadin 7.x</Implementation-Title>
                             <Implementation-Version>${project.version}</Implementation-Version>
                             <Vaadin-Widgetsets>pl.exsio.plupload.PluploadWidgetSet</Vaadin-Widgetsets>
                         </manifestEntries>
@@ -163,7 +165,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>vaadin-plupload-${project.version}</finalName>
+        <finalName>plupload-vaadin-${project.version}</finalName>
     </build>
     
     <profiles>
