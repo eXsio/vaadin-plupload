@@ -32,15 +32,14 @@ You can install it using Maven:
 
 ### Why is this add-on worthy of Your interest?
 
-Well, there is a number of reasons, but the main ones are:
 - Live upload progress updates without any needs of Push dependencies or enabled asyncSupported feature.
 - Chunked uploads with direct streaming to the desired destination - meaning that You can upload gigabyte-sized files without worrying about memory (RAM) usage on the server part, and if something goes wrong with the network the uploader will try to send the chunk again. You can also pause the upload and resume it, when network problems are resolved.
-- Tons of events and event handlers give You the ability to respond dynamically to almost every situation
+- Many events and event handlers give You the ability to respond dynamically to almost every situation
 - 3 different compontents with 3 different purposes and complexity levels - choose the right one and customize it to Your needs
 
 ### How is all this possible? 
 
-It's very simple - the Plupload library (on the client side) controls the upload process and sends appropriate event, which are propagated to the server side through RPC. The server side can respond accordingly and control the upload process this way, or update the UI components. All the chunking and resizing (in case of images) is done on the client side. All server side has to do is implement some event handlers.
+The Plupload library (on the client side) controls the upload process and sends appropriate event, which are propagated to the server side through RPC. The server side can respond accordingly and control the upload process this way, or update the UI components. All the chunking and resizing (in case of images) is done on the client side. All server side has to do is implement some event handlers.
 
 ---
 
@@ -237,7 +236,7 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
   
 ### Troubleshooting
 
-  This is a fairly new stuff and it's not properly polished yet, so there is a serious possibility that something can go wrong somewhere. Don't get angry at the code (or at me for that matter), just submit an issue or work on the problem and submit a pull request here: https://github.com/eXsio/vaadin-plupload. Cheers!
+  This is a fairly new code and it's not properly polished yet, so there is a serious possibility that something can go wrong somewhere. Don't get angry, just submit an issue or work on the problem and submit a pull request here: https://github.com/eXsio/vaadin-plupload. Cheers!
 
 
 ### Known Bugs
