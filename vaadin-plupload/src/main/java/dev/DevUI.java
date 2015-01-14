@@ -25,6 +25,7 @@ package dev;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.validator.NullValidator;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -42,53 +43,65 @@ import pl.exsio.plupload.manager.PluploadManager;
 @SuppressWarnings("serial")
 @Theme("valo")
 public class DevUI extends UI {
-
+    
     @WebServlet(value = "/*", asyncSupported = false)
     @VaadinServletConfiguration(productionMode = false, ui = DevUI.class, widgetset = "pl.exsio.plupload.PluploadWidgetSet")
     public static class DevServlet extends VaadinServlet {
     }
-
+    
     private class Counter {
-
+        
         private int i = 0;
-
+        
         void increment() {
             i++;
         }
-
+        
         int get() {
             return i;
         }
-
+        
         void reset() {
             i = 0;
         }
     }
-
+    
     @Override
     protected void init(VaadinRequest request) {
-
+        
         final VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setSpacing(true);
         mainLayout.setMargin(true);
-
+        
         PluploadManager mgr = createUploadManager("Manager 1");
         PluploadManager mgr2 = createUploadManager("Manager 2");
-
+        
         mgr.getUploader().addFilter(new PluploadFilter("music", "mp3,flac"));
         mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
-         mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
-
+        mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
+        
         mainLayout.addComponent(mgr);
         mainLayout.addComponent(mgr2);
-
+        
         PluploadField<File> field = createUploadField();
-        mainLayout.addComponent(field);
-
+        final Form form = new Form();
+        form.addField("file", field);
+        field.addValidator(new NullValidator("file must not be null", false));
+        Button submit = new Button("commit form");
+        submit.addClickListener(new Button.ClickListener() {
+            
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                form.commit();
+            }
+        });
+        mainLayout.addComponent(form);
+        mainLayout.addComponent(submit);
+        
         final Plupload uploader = createSimpleUploader();
         uploader.setEnabled(false);
         Button b = new Button("toggle Enabled!", new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 uploader.setEnabled(!uploader.isEnabled());
@@ -98,11 +111,11 @@ public class DevUI extends UI {
         mainLayout.addComponent(uploader);
         final Counter c = new Counter();
         final Button.ClickListener l = new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Window w = new Window("win");
-
+                
                 if (c.get() < 5) {
                     w.setContent(new Button("win", this));
                     c.increment();
@@ -116,21 +129,21 @@ public class DevUI extends UI {
                 getUI().addWindow(w);
             }
         };
-
+        
         Button win = new Button("Win");
         win.addClickListener(l);
         mainLayout.addComponent(win);
-
+        
         Button modal = new Button("modal");
         modal.addClickListener(new Button.ClickListener() {
-
+            
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Window w = new Window("modal");
-
+                
                 final PluploadField f = createUploadField();
                 w.addCloseListener(new Window.CloseListener() {
-
+                    
                     @Override
                     public void windowClose(Window.CloseEvent e) {
                         Notification.show("closed modal");
@@ -140,44 +153,44 @@ public class DevUI extends UI {
                 VerticalLayout lay = new VerticalLayout();
                 lay.addComponent(f);
                 lay.addComponent(new Button("destroy", new Button.ClickListener() {
-
+                    
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
                         f.getUploader().destroy();
                     }
                 }));
-
+                
                 w.setContent(lay);
                 w.setModal(true);
                 getUI().addWindow(w);
             }
         });
-
+        
         Accordion acc = new Accordion();
         acc.addTab(this.createUploadManager("mgr3"), "uploader");
         acc.addTab(new HorizontalLayout(), "Stub");
-
+        
         mainLayout.addComponent(acc);
-
+        
         mainLayout.addComponent(modal);
         this.setContent(mainLayout);
-
+        
     }
-
+    
     private PluploadField<File> createUploadField() {
         final PluploadField<File> field = new PluploadField(File.class);
         field.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-
+            
             @Override
             public void onUploadComplete() {
                 File file = field.getValue();
-
+                
                 System.out.println(file != null ? file.getAbsolutePath() : "null");
             }
         });
         return field;
     }
-
+    
     private Plupload createSimpleUploader() {
         //instantiate the uploader just as it was a norman Vaadin Button
         final Plupload uploader = new Plupload("Browse", FontAwesome.FILES_O);
@@ -185,13 +198,13 @@ public class DevUI extends UI {
         uploader.setMaxFileSize("5mb");
         //prevent duplicate files
         uploader.setPreventDuplicates(true);
-
+        
         uploader.setMultiSelection(false);
         //add filter
         uploader.addFilter(new PluploadFilter("music", "mp3,flac"));
         //add file uploaded handler
         uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
-
+            
             @Override
             public void onFileUploaded(PluploadFile file) {
                 File uploadedFile = file.getUploadedFile();
@@ -200,7 +213,7 @@ public class DevUI extends UI {
         });
         //add upload completed handler
         uploader.addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-
+            
             @Override
             public void onUploadComplete() {
                 System.out.println("Upload was completed");
@@ -211,7 +224,7 @@ public class DevUI extends UI {
         });
         //add upload pgoress handler
         uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
-
+            
             @Override
             public void onUploadProgress(PluploadFile file) {
                 System.out.println("I'm uploading file " + file.getName() + " and I'm at " + file.getPercent() + "%");
@@ -219,7 +232,7 @@ public class DevUI extends UI {
         });
         //add files added handler - autostart the uploader after files addition
         uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
-
+            
             @Override
             public void onFilesAdded(PluploadFile[] files) {
                 uploader.start();
@@ -227,13 +240,13 @@ public class DevUI extends UI {
         });
         return uploader;
     }
-
+    
     private PluploadManager createUploadManager(final String name) {
         final PluploadManager mgr = new PluploadManager();
         //mgr.getUploader().setUploadPath("/home/exsio");
         System.out.println("upload path for " + name + ": " + mgr.getUploader().getUploadPath());
         mgr.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
-
+            
             @Override
             public void onUploadComplete() {
                 System.out.println("Files uploaded by " + name + ": ");
@@ -243,21 +256,21 @@ public class DevUI extends UI {
             }
         });
         mgr.getUploader().addErrorListener(new Plupload.ErrorListener() {
-
+            
             @Override
             public void onError(PluploadError error) {
                 Notification.show("Upload error: " + error.getMessage() + " - " + error.getFile().getType(), Notification.Type.ERROR_MESSAGE);
             }
         });
         mgr.getUploader().addFileFilteredListener(new Plupload.FileFilteredListener() {
-
+            
             @Override
             public void onFileFiltered(PluploadFile file) {
                 System.out.println("This file was filtered: " + file.getName());
             }
         });
-
+        
         return mgr;
     }
-
+    
 }
