@@ -6,6 +6,10 @@ Pluploader is the most powerful client-side upload library out there and it woul
 ### Attention!
 The MIT license concernes olny the addon. If You want to use Plupload, please familiarize youself with it's licensing terms, which can be found here: http://www.plupload.com/license/gplv2 and here: http://www.plupload.com/license/oem
 
+### Online demo
+
+You can find a working examples here: http://vaadin-plupload.jelastic.servint.net/examples/
+
 ---
 
 ### Installation
@@ -59,6 +63,7 @@ There are 3 main components in this add-on:
  - UploadStopped
  - UploadProgress
  - UploadComplete
+ - Init
  - Error
  - Destroy
  ```
@@ -70,10 +75,10 @@ There are 3 main components in this add-on:
         final Plupload uploader = new Plupload("Browse", FontAwesome.FILES_O);
 
         //set the maximum size of uploaded file
-        uploader.setOption(PluploadOption.MAX_FILE_SIZE, "50mb");
+        uploader.setMaxFileSize("50mb");
         
         //prevent duplicate files
-        uploader.setOption(PluploadOption.PREVENT_DUPLICATES, "true");
+        uploader.setPreventDuplicates(true);
         
         //add filter
         uploader.addFilter(new PluploadFilter("music", "mp3, flac"));
