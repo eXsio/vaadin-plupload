@@ -19,7 +19,7 @@ You can install it using Maven:
 <dependency>
    <groupId>pl.exsio</groupId>
    <artifactId>plupload-vaadin</artifactId>
-   <version>1.4.1</version>
+   <version>1.4.2</version>
 </dependency>
 
 <repository>
