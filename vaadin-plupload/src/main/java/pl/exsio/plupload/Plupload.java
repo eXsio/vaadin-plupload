@@ -74,10 +74,13 @@ public class Plupload extends Button {
 
     protected int maxRetries = 3;
 
-    protected final String uploaderKey = DigestUtils.md2Hex(
-            new Random().nextInt(Integer.MAX_VALUE)
+    protected final String uploaderKey = 
+            (new Random().nextInt(Integer.MAX_VALUE)
+            + new Random().nextInt(Integer.MAX_VALUE)
             + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())
-            + new Random().nextInt(Integer.MAX_VALUE));
+            + new Random().nextInt(Integer.MAX_VALUE)
+            + new Random().nextInt(Integer.MAX_VALUE)
+            + new Random().nextInt(Integer.MAX_VALUE)).substring(2, 42);
 
     public Plupload() {
         super();
