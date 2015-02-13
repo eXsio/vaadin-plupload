@@ -37,13 +37,14 @@ public abstract class PluploadJSNIDelegate implements Serializable {
             button.click();
     }-*/;
     
-    public static native void attachUploader(Element button, PluploadServerRpc rpc, String uploaderKey) 
+    public static native void attachUploader(Element uploadTrigger, PluploadServerRpc rpc, String uploaderKey, Element dropZone) 
     /*-{
         $wnd.uploaders = $wnd.uploaders || {};
         if(typeof $wnd.uploaders[uploaderKey] === 'undefined') {
             @com.vaadin.client.VConsole::log(Ljava/lang/String;)('creating uploader "'+uploaderKey+'"');
             var uploader = new $wnd.plupload.Uploader({
-                browse_button: button,
+                browse_button: uploadTrigger,
+                drop_element: dropZone,
                 url: 'pluploader-upload-action',
                 max_file_size : '1000mb',
                 chunk_size: '1mb',
@@ -222,4 +223,30 @@ public abstract class PluploadJSNIDelegate implements Serializable {
             delete $wnd.uploaders[uploaderKey];
        }   
     }-*/;
+    
+    
+    public static native void addDropZone(String uploaderKey, String dropZoneId)
+    /*-{
+            $wnd.uploaders = $wnd.uploaders || {};
+            if(typeof $wnd.uploaders[uploaderKey] === 'object') {    
+                var uploader = $wnd.uploaders[uploaderKey];
+                var element = $doc.getElementById(dropZoneId);
+                if(typeof element !== 'undefined') {
+                    @com.vaadin.client.VConsole::log(Ljava/lang/String;)('adding new drop zone with id "'+dropZoneId+'" to uploader "'+uploaderKey+'"');
+                    var dropzone = new $wnd.mOxie.FileDrop({
+                        drop_zone: element
+                    }); 
+                    dropzone.ondrop = function( event ) {
+                        uploader.addFile( dropzone.files );
+                    };
+                    dropzone.init(); 
+                    uploader.dropZones = uploader.dropZones || [];
+                    uploader.dropZones.push(dropzone);
+                } else {
+                    @com.vaadin.client.VConsole::error(Ljava/lang/String;)('cannot add new drop zone to uploader "'+uploaderKey+'", because there is no element with id "'+dropZoneId+'"');
+                }
+                
+            }
+    }-*/;
+            
 }

@@ -60,7 +60,7 @@ public class PluploadConnector extends ButtonConnector {
         this.uploaderKey = this.getState().uploaderKey;
         this.fetchUploadTrigger();
         getWidget().getElement().getOwnerDocument().getBody().appendChild(this.uploadTrigger);
-        PluploadJSNIDelegate.attachUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey);
+        PluploadJSNIDelegate.attachUploader(this.uploadTrigger, this.serverRpc, this.uploaderKey, this.getWidget().getElement());
         getWidget().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -74,7 +74,7 @@ public class PluploadConnector extends ButtonConnector {
         String triggerId = this.getUploadTriggerId();
         Element trigger = DOM.getElementById(triggerId);
         if (trigger == null) {
-            trigger = this.createUploadTrigger(trigger, triggerId);
+            trigger = this.createUploadTrigger(triggerId);
         }
         this.uploadTrigger = trigger;
     }
@@ -84,8 +84,8 @@ public class PluploadConnector extends ButtonConnector {
         return triggerId;
     }
 
-    private Element createUploadTrigger(Element trigger, String triggerId) {
-        trigger = DOM.createButton();
+    private Element createUploadTrigger(String triggerId) {
+        Element trigger = DOM.createButton();
         trigger.setAttribute("id", triggerId);
         trigger.setAttribute("style", "display:none;");
         return trigger;
@@ -138,6 +138,11 @@ public class PluploadConnector extends ButtonConnector {
         @Override
         public void setOption(String name, String value) {
             PluploadJSNIDelegate.setOption(uploaderKey, name, value);
+        }
+
+        @Override
+        public void addDropZone(String dropZoneId) {
+            PluploadJSNIDelegate.addDropZone(uploaderKey, dropZoneId);
         }
 
     };

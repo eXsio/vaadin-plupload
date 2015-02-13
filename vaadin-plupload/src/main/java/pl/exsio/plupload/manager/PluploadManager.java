@@ -50,19 +50,13 @@ public class PluploadManager extends VerticalLayout {
 
     protected final Map<String, Item> itemsMap;
 
-    protected String browseLabel = "Browse";
-
-    protected String startLabel = "Start";
-
-    protected String stopLabel = "Stop";
-
     protected String removeLabel = "";
 
-    protected Plupload uploader;
+    protected final Plupload uploader = new Plupload("Browse", FontAwesome.FILES_O);
 
-    protected Button startButton;
+    protected final Button startButton = new Button("Start", FontAwesome.PLAY);
 
-    protected Button stopButton;
+    protected final Button stopButton = new Button("Stop", FontAwesome.STOP);
 
     protected final Set<ItemCreationListener> itemCreationListeners = new LinkedHashSet<>();
 
@@ -86,7 +80,6 @@ public class PluploadManager extends VerticalLayout {
         this.handleUploadComplete();
         this.handleStartButtonClick();
         this.handleStopButtonClick();
-        //this.handleUploaderDestroy();
     }
 
     private void initManager() {
@@ -98,15 +91,14 @@ public class PluploadManager extends VerticalLayout {
     private void initControls() {
         this.controls.setSpacing(true);
         this.controls.setStyleName("plupload-mgr-controls");
-        uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
-        startButton = new Button(this.startLabel, FontAwesome.PLAY);
-        stopButton = new Button(this.stopLabel, FontAwesome.STOP);
-        startButton.setEnabled(false);
-        stopButton.setEnabled(false);
+        this.startButton.setEnabled(false);
+        this.stopButton.setEnabled(false);
         this.controls.addComponent(uploader);
         this.controls.addComponent(startButton);
         this.controls.addComponent(stopButton);
-
+        String id = "plupload-manager-" + this.uploader.getUploaderKey();
+        this.setId(id);
+        this.uploader.addDropZone(id);
         this.addComponent(this.controls);
     }
 

@@ -24,10 +24,10 @@
 package pl.exsio.plupload;
 
 import pl.exsio.plupload.helper.filter.PluploadFilter;
-import pl.exsio.plupload.helper.filter.PluploadFilters;
 import com.google.gson.Gson;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.Resource;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import java.io.File;
 import java.io.Serializable;
@@ -36,10 +36,10 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
-import org.apache.commons.codec.digest.DigestUtils;
 import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.shared.PluploadState;
 import pl.exsio.plupload.client.PluploadServerRpc;
+import pl.exsio.plupload.ex.InvalidDropZoneIdException;
 import pl.exsio.plupload.helper.filter.PluploadFilters;
 import pl.exsio.plupload.helper.resize.PluploadImageResize;
 
@@ -74,8 +74,8 @@ public class Plupload extends Button {
 
     protected int maxRetries = 3;
 
-    protected final String uploaderKey = 
-            (new Random().nextInt(Integer.MAX_VALUE)
+    protected final String uploaderKey
+            = (new Random().nextInt(Integer.MAX_VALUE)
             + new Random().nextInt(Integer.MAX_VALUE)
             + new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())
             + new Random().nextInt(Integer.MAX_VALUE)
@@ -304,6 +304,19 @@ public class Plupload extends Button {
         return this.chunkSize;
     }
 
+    public Plupload addDropZone(String dropZoneId) {
+        if (dropZoneId != null && !"".equals(dropZoneId)) {
+            this.getClient().addDropZone(dropZoneId);
+            return this;
+        } else {
+            throw new InvalidDropZoneIdException("Drop zone must have an non-empty id");
+        }
+    }
+
+    public Plupload addDropZone(AbstractComponent component) {
+        return this.addDropZone(component.getId());
+    }
+
     public Plupload setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
         this.getClient().setOption(Option.MAX_FILE_SIZE.toString(), maxFileSize);
@@ -342,6 +355,10 @@ public class Plupload extends Button {
 
     public boolean isMultiSelection() {
         return this.multiSelection;
+    }
+
+    public String getUploaderKey() {
+        return uploaderKey;
     }
 
     public Plupload start() {

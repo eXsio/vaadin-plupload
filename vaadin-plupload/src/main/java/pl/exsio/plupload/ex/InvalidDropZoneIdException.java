@@ -21,29 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload.client;
+package pl.exsio.plupload.ex;
 
-import com.vaadin.shared.communication.ClientRpc;
+import java.io.Serializable;
 
 /**
  *
  * @author exsio
  */
-public interface PluploadCilentRpc extends ClientRpc {
+public class InvalidDropZoneIdException extends RuntimeException implements Serializable {
 
-    void start();
-
-    void stop();
-
-    void refresh();
-
-    void disableBrowse(boolean disable);
-
-    void removeFile(String fileId);
-
-    void destroy();
-
-    void setOption(String name, String value);
-    
-    void addDropZone(String dropZoneId);
+    public InvalidDropZoneIdException(String msg) {
+        super(msg);
+    }
 }
