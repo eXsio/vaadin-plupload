@@ -48,28 +48,27 @@ import static pl.exsio.plupload.util.PluploadUtil.trimTextInTheMiddle;
  * @author exsio
  */
 public class PluploadField<T extends Object> extends CustomField<T> {
-    
+
     protected final Class<T> returnTypeClass;
-    
+
     protected String browseLabel = "Browse";
-    
+
     protected String removeLabel = "";
-    
-    protected Plupload uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
-    ;
+
+    protected final Plupload uploader = new Plupload(this.browseLabel, FontAwesome.FILES_O);
 
     protected ProgressBar progressBar;
-    
+
     protected Label nameLabel;
-    
+
     protected Button removeButton;
-    
+
     protected HorizontalLayout layout;
-    
+
     protected PluploadFile currentFile;
-    
+
     protected PluploadFile newFile;
-    
+
     public PluploadField(Class<T> returnTypeClass) {
         if (!byte[].class.equals(returnTypeClass) && !File.class.equals(returnTypeClass)) {
             throw new UnsupportedFieldTypeException("The types supported by this field are byte[] and java.io.File.");
@@ -77,57 +76,57 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.returnTypeClass = returnTypeClass;
         this.initHandlers();
     }
-    
+
     @Override
     protected Component initContent() {
-        
+
         this.layout = new HorizontalLayout();
         this.layout.setMargin(true);
         this.layout.setSpacing(true);
-        
+
         this.uploader.setMultiSelection(false);
-        
+
         this.progressBar = new ProgressBar();
         this.progressBar.setIndeterminate(false);
         this.progressBar.setValue(0f);
         this.progressBar.setWidth("128px");
         this.progressBar.setVisible(false);
-        
+
         this.nameLabel = new Label();
         this.nameLabel.setWidth("128px");
-        
+
         this.removeButton = new Button(removeLabel, FontAwesome.TIMES);
         this.removeButton.setVisible(false);
-        
+
         VerticalLayout vlayout = new VerticalLayout();
-        
+
         vlayout.addComponent(this.nameLabel);
         vlayout.addComponent(this.progressBar);
-        
+
         layout.addComponent(this.uploader);
         layout.addComponent(vlayout);
         layout.addComponent(this.removeButton);
         layout.setComponentAlignment(this.removeButton, Alignment.TOP_RIGHT);
-        
+
         return layout;
     }
-    
+
     public Plupload getUploader() {
         return this.uploader;
     }
-    
+
     private void initHandlers() {
-        
+
         this.handleFilesAdded();
         this.handleFilesRemoved();
         this.handleUploadProgress();
         this.handleFileUploaded();
-        
+
     }
-    
+
     private void handleFileUploaded() {
         this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
-            
+
             @Override
             public void onFileUploaded(PluploadFile file) {
                 if (File.class.equals(returnTypeClass)) {
@@ -143,10 +142,10 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             }
         });
     }
-    
+
     private void handleUploadProgress() {
         this.uploader.addUploadProgressListener(new Plupload.UploadProgressListener() {
-            
+
             @Override
             public void onUploadProgress(PluploadFile file) {
                 progressBar.setValue(new Long(file.getPercent()).floatValue() / 100);
@@ -154,10 +153,10 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             }
         });
     }
-    
+
     private void handleUploaderDestroy() {
         this.uploader.addDestroyListener(new Plupload.DestroyListener() {
-            
+
             @Override
             public void onDestroy() {
                 if (currentFile != null) {
@@ -166,23 +165,23 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             }
         });
     }
-    
+
     private void handleFilesRemoved() {
         this.uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
-            
+
             @Override
             public void onFilesRemoved(PluploadFile[] files) {
                 if (files[0].equals(currentFile)) {
                     resetField();
                 }
             }
-            
+
         });
     }
-    
+
     private void handleFilesAdded() {
         this.uploader.addFilesAddedListener(new Plupload.FilesAddedListener() {
-            
+
             @Override
             public void onFilesAdded(final PluploadFile[] files) {
                 if (files.length == 1) {
@@ -193,7 +192,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
                         removeButton.setVisible(true);
                         progressBar.setVisible(true);
                         removeButton.addClickListener(new Button.ClickListener() {
-                            
+
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
                                 uploader.removeFile(files[0].getId());
@@ -209,12 +208,12 @@ public class PluploadField<T extends Object> extends CustomField<T> {
             }
         });
     }
-    
+
     @Override
     public Class<? extends T> getType() {
         return this.returnTypeClass;
     }
-    
+
     private void resetField() throws Converter.ConversionException, ReadOnlyException {
         nameLabel.setValue("");
         nameLabel.setDescription("");
@@ -227,5 +226,5 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         currentFile = null;
         setValue(null);
     }
-    
+
 }

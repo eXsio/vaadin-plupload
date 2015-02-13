@@ -77,10 +77,21 @@ public class DevUI extends UI {
         PluploadManager mgr2 = createUploadManager("Manager 2");
 
         mgr.getUploader().addFilter(new PluploadFilter("music", "mp3,flac"));
+
+        VerticalLayout dropZone = new VerticalLayout() {
+            {
+                addComponent(new Label("Additional drop zone for music files"));
+                setId("music-drop-zone");
+            }
+        };
+        
+        mgr.getUploader().addDropZone(dropZone);
+
         mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
         mgr2.getUploader().setImageResize(new PluploadImageResize().setEnabled(true).setCrop(true).setHeight(200).setWidth(400));
 
         mainLayout.addComponent(mgr);
+        mainLayout.addComponent(dropZone);
         mainLayout.addComponent(mgr2);
 
         PluploadField<File> field = createUploadField();
