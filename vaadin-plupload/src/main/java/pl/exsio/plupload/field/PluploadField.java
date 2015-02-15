@@ -81,7 +81,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
     protected Component initContent() {
 
         this.layout = new HorizontalLayout();
-        this.layout.setMargin(true);
         this.layout.setSpacing(true);
 
         this.uploader.setMultiSelection(false);
