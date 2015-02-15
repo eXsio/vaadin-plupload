@@ -227,4 +227,18 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         setValue(null);
     }
 
+    /**
+     * Set the browse button's label. Defaults to "Browse".
+     */
+    public void setBrowseLabel(String browseLabel) {
+        this.browseLabel = browseLabel;
+    }
+
+    /**
+     * Set the remove button's label. Defaults to a empty String.
+     */
+    public void setRemoveLabel(String removeLabel) {
+        this.removeLabel = removeLabel;
+    }
+
 }
