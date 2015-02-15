@@ -80,7 +80,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
 
     @Override
     public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
-        if (UPLOAD_ACTION_PATH.equals(request.getPathInfo().replaceAll("/", ""))) {
+        if (request.getPathInfo() != null && request.getPathInfo().endsWith(UPLOAD_ACTION_PATH)) {
             if (request instanceof VaadinServletRequest) {
                 VaadinServletRequest vsr = (VaadinServletRequest) request;
                 HttpServletRequest req = vsr.getHttpServletRequest();
