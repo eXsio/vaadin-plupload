@@ -10,6 +10,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <vaadin.version>7.3.10</vaadin.version>
+        <netbeans.hint.license>mit</netbeans.hint.license>
     </properties>
     
     <name>vaadin-plupload</name>
