@@ -81,21 +81,26 @@ public class PluploadField<T extends Object> extends CustomField<T> {
     protected Component initContent() {
 
         this.layout = new HorizontalLayout();
+        this.layout.setStyleName("plupload-field");
         this.layout.setSpacing(true);
 
         this.uploader.setMultiSelection(false);
+        this.uploader.setStyleName("plupload-field-uploader");
 
         this.progressBar = new ProgressBar();
         this.progressBar.setIndeterminate(false);
         this.progressBar.setValue(0f);
         this.progressBar.setWidth("128px");
+        this.progressBar.setStyleName("plupload-field-progressbar");
         this.progressBar.setVisible(false);
 
         this.nameLabel = new Label();
+        this.nameLabel.setStyleName("plupload-field-name");
         this.nameLabel.setWidth("128px");
 
         this.removeButton = new Button(removeLabel, FontAwesome.TIMES);
         this.removeButton.setVisible(false);
+        this.removeButton.setStyleName("plupload-field-remove");
 
         VerticalLayout vlayout = new VerticalLayout();
 
@@ -231,6 +236,9 @@ public class PluploadField<T extends Object> extends CustomField<T> {
      */
     public void setBrowseLabel(String browseLabel) {
         this.browseLabel = browseLabel;
+        if (this.uploader != null) {
+            this.uploader.setCaption(browseLabel);
+        }
     }
 
     /**
@@ -238,6 +246,9 @@ public class PluploadField<T extends Object> extends CustomField<T> {
      */
     public void setRemoveLabel(String removeLabel) {
         this.removeLabel = removeLabel;
+        if (this.removeButton != null) {
+            this.removeButton.setCaption(removeLabel);
+        }
     }
 
 }
