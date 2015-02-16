@@ -230,6 +230,7 @@ public class Plupload extends Button {
         @Override
         public void error(String json) {
             PluploadError error = new Gson().fromJson(json, PluploadError.class);
+            error.setType();
             for (ErrorListener listener : errorListeners) {
                 listener.onError(error);
             }

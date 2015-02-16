@@ -313,7 +313,7 @@ public class PluploadManager extends VerticalLayout {
             
             this.setStyleName("plupload-mgr-item plupload-mgr-item-" + file.getId());
             
-            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 33));
+            this.nameLabel = new Label(trimTextInTheMiddle(file.getName(), 30));
             this.nameLabel.setWidth("270px");
             this.nameLabel.setDescription(file.getName());
             this.nameLabel.setStyleName("plupload-mgr-item-name");

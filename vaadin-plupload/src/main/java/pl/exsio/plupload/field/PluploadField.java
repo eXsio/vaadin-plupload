@@ -98,7 +98,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.nameLabel.setStyleName("plupload-field-name");
         this.nameLabel.setWidth("128px");
 
-        this.removeButton = new Button(removeLabel, FontAwesome.TIMES);
+        this.removeButton = new Button(this.removeLabel, FontAwesome.TIMES);
         this.removeButton.setVisible(false);
         this.removeButton.setStyleName("plupload-field-remove");
 
@@ -107,10 +107,10 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         vlayout.addComponent(this.nameLabel);
         vlayout.addComponent(this.progressBar);
 
-        layout.addComponent(this.uploader);
-        layout.addComponent(vlayout);
-        layout.addComponent(this.removeButton);
-        layout.setComponentAlignment(this.removeButton, Alignment.TOP_RIGHT);
+        this.layout.addComponent(this.uploader);
+        this.layout.addComponent(vlayout);
+        this.layout.addComponent(this.removeButton);
+        this.layout.setComponentAlignment(this.removeButton, Alignment.TOP_RIGHT);
 
         return layout;
     }
@@ -158,18 +158,6 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         });
     }
 
-    private void handleUploaderDestroy() {
-        this.uploader.addDestroyListener(new Plupload.DestroyListener() {
-
-            @Override
-            public void onDestroy() {
-                if (currentFile != null) {
-                    resetField();
-                }
-            }
-        });
-    }
-
     private void handleFilesRemoved() {
         this.uploader.addFilesRemovedListener(new Plupload.FilesRemovedListener() {
 
@@ -191,7 +179,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
                 if (files.length == 1) {
                     if (currentFile == null) {
                         currentFile = files[0];
-                        nameLabel.setValue(trimTextInTheMiddle(files[0].getName(), 14));
+                        nameLabel.setValue(trimTextInTheMiddle(files[0].getName(), 12));
                         nameLabel.setDescription(files[0].getName());
                         removeButton.setVisible(true);
                         progressBar.setVisible(true);
@@ -219,15 +207,15 @@ public class PluploadField<T extends Object> extends CustomField<T> {
     }
 
     private void resetField() throws Converter.ConversionException, ReadOnlyException {
-        nameLabel.setValue("");
-        nameLabel.setDescription("");
-        progressBar.setValue(0f);
-        progressBar.setVisible(false);
-        removeButton.setVisible(false);
-        for (Object listener : removeButton.getListeners(Button.ClickListener.class)) {
-            removeButton.removeClickListener((Button.ClickListener) listener);
+        this.nameLabel.setValue("");
+        this.nameLabel.setDescription("");
+        this.progressBar.setValue(0f);
+        this.progressBar.setVisible(false);
+        this.removeButton.setVisible(false);
+        for (Object listener : this.removeButton.getListeners(Button.ClickListener.class)) {
+            this.removeButton.removeClickListener((Button.ClickListener) listener);
         }
-        currentFile = null;
+        this.currentFile = null;
         setValue(null);
     }
 

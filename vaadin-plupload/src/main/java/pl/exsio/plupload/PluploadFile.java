@@ -57,7 +57,7 @@ public class PluploadFile implements Serializable {
         return percent;
     }
 
-    public void setPercent(int percent) {
+    void setPercent(int percent) {
         this.percent = percent;
     }
 
@@ -65,7 +65,7 @@ public class PluploadFile implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
+    void setId(String id) {
         this.id = id;
     }
 
@@ -73,7 +73,7 @@ public class PluploadFile implements Serializable {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(String lastModifiedDate) {
+    void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
@@ -81,7 +81,7 @@ public class PluploadFile implements Serializable {
         return origSize;
     }
 
-    public void setOrigSize(long origSize) {
+    void setOrigSize(long origSize) {
         this.origSize = origSize;
     }
 
@@ -89,7 +89,7 @@ public class PluploadFile implements Serializable {
         return size;
     }
 
-    public void setSize(long size) {
+    void setSize(long size) {
         this.size = size;
     }
 
@@ -97,7 +97,7 @@ public class PluploadFile implements Serializable {
         return status;
     }
 
-    public void setStatus(int status) {
+    void setStatus(int status) {
         this.status = status;
     }
 
@@ -105,7 +105,7 @@ public class PluploadFile implements Serializable {
         return type;
     }
 
-    public void setType(String type) {
+    void setType(String type) {
         this.type = type;
     }
 
@@ -113,7 +113,7 @@ public class PluploadFile implements Serializable {
         return loaded;
     }
 
-    public void setLoaded(long loaded) {
+    void setLoaded(long loaded) {
         this.loaded = loaded;
     }
 
@@ -121,7 +121,7 @@ public class PluploadFile implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
@@ -129,7 +129,7 @@ public class PluploadFile implements Serializable {
         return uploadedFile;
     }
 
-    public void setUploadedFile(File uploadedFile) {
+    void setUploadedFile(File uploadedFile) {
         this.uploadedFile = uploadedFile;
     }
 

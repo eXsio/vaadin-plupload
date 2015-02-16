@@ -84,7 +84,7 @@ public class DevUI extends UI {
                 setId("music-drop-zone");
             }
         };
-        
+
         mgr.getUploader().addDropZone(dropZone);
 
         mgr2.getUploader().addFilter(new PluploadFilter("images", "jpg, jpeg, png"));
@@ -270,7 +270,7 @@ public class DevUI extends UI {
 
             @Override
             public void onError(PluploadError error) {
-                Notification.show("Upload error: " + error.getMessage() + " - " + error.getFile().getType(), Notification.Type.ERROR_MESSAGE);
+                Notification.show("Upload error: " + error.getMessage() + " - " + error.getFile().getType() + " (" + error.getType() + ")", Notification.Type.ERROR_MESSAGE);
             }
         });
         mgr.getUploader().addFileFilteredListener(new Plupload.FileFilteredListener() {

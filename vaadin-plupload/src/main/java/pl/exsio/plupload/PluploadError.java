@@ -37,28 +37,80 @@ public class PluploadError implements Serializable {
 
     protected String message;
 
-    public int getCode() {
-        return code;
+    protected Type type;
+
+    public enum Type {
+
+        GENERIC_ERROR(-100),
+        HTTP_ERROR(-200),
+        IO_ERROR(-300),
+        SECURITY_ERROR(-400),
+        INIT_ERROR(-500),
+        FILE_SIZE_ERROR(-600),
+        FILE_EXTENSION_ERROR(-601),
+        FILE_DUPLICATE_ERROR(-602),
+        IMAGE_FORMAT_ERROR(-700),
+        MEMORY_ERROR(-701),
+        UNKNOWN_ERROR(0);
+
+        private int code;
+
+        private Type(int code) {
+            this.code = code;
+        }
+
+        public int getCode() {
+            return this.code;
+        }
+
+        public static Type byCode(int code) {
+            for (Type type : Type.values()) {
+                if (type.getCode() == code) {
+                    return type;
+                }
+            }
+            return UNKNOWN_ERROR;
+        }
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public int getCode() {
+        return code;
     }
 
     public PluploadFile getFile() {
         return file;
     }
 
-    public void setFile(PluploadFile file) {
-        this.file = file;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public Type getType() {
+        return type;
+    }
+
+    void setType() {
+        this.type = Type.byCode(code);
+    }
+
+    void setCode(int code) {
+        this.code = code;
+    }
+
+    void setFile(PluploadFile file) {
+        this.file = file;
+    }
+
+    void setMessage(String message) {
         this.message = message;
+    }
+
+    void setType(Type type) {
+        this.type = type;
+    }
+
+    public boolean is(Type type) {
+        return this.type != null && this.type.equals(type);
     }
 
 }
