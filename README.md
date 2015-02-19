@@ -19,7 +19,7 @@ You can install it using Maven:
 <dependency>
    <groupId>pl.exsio</groupId>
    <artifactId>plupload-vaadin</artifactId>
-   <version>1.4.2</version>
+   <version>1.5.3</version>
 </dependency>
 
 <repository>
@@ -35,6 +35,7 @@ You can install it using Maven:
 - Live upload progress updates without any needs of Push dependencies or enabled asyncSupported feature.
 - Chunked uploads with direct streaming to the desired destination - meaning that You can upload gigabyte-sized files without worrying about memory (RAM) usage on the server part, and if something goes wrong with the network the uploader will try to send the chunk again. You can also pause the upload and resume it, when network problems are resolved.
 - Many events and event handlers give You the ability to respond dynamically to almost every situation
+- full drag&drop support
 - 3 different compontents with 3 different purposes and complexity levels - choose the right one and customize it to Your needs
 
 ### How is all this possible? 
