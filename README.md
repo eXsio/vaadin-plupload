@@ -64,8 +64,10 @@ There are 3 main components in this add-on:
   - max file upload setting
   - chunk size setting
   - no. of retries setting
-  
+
   Events suported by Plupload add-on:
+
+  Client-side events
   ```
  - FilesAdded
  - FilesRemoved
@@ -79,7 +81,15 @@ There are 3 main components in this add-on:
  - Error
  - Destroy
  ```
-  
+ 
+ Server-side events
+ ```
+ - ChunkUploaded
+ ```
+
+  You cannot update the UI or any other Vaadin related stuff in the handlers of server-side events. That is, because
+  server side events are executed by a separate RequestHandler that is not aware of an UI.
+ 
   Example usage of the Plupload component:
   
   ```
