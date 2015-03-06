@@ -21,14 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package pl.exsio.plupload;
+
+import java.lang.ref.WeakReference;
+import java.util.Set;
+import pl.exsio.plupload.Plupload.ChunkUploadedListener;
 
 /**
  *
  * @author sdymi_000
  */
 public class PluploadFileConfig {
-    
+
     public String uploadPath;
+
+    public boolean saveFileOnDisk;
+
+    public WeakReference<Set<ChunkUploadedListener>> chunkUploadedListeners;
 }

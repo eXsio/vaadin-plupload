@@ -31,6 +31,7 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import java.io.File;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -71,6 +72,8 @@ public class Plupload extends Button {
     protected boolean multiSelection = true;
 
     protected boolean preventDuplicates = false;
+
+    protected boolean saveFileOnDisk = true;
 
     protected int maxRetries = 3;
 
@@ -116,12 +119,13 @@ public class Plupload extends Button {
         CHUNK_SIZE("chunk_size"),
         MAX_FILE_SIZE("max_file_size");
 
-        private String name;
+        private final String name;
 
         private Option(String name) {
             this.name = name;
         }
 
+        @Override
         public String toString() {
             return this.name;
         }
@@ -178,6 +182,8 @@ public class Plupload extends Button {
             public void onFilesAdded(PluploadFile[] files) {
                 PluploadFileConfig config = new PluploadFileConfig();
                 config.uploadPath = uploadPath;
+                config.chunkUploadedListeners = new WeakReference(chunkUploadedListeners);
+                config.saveFileOnDisk = saveFileOnDisk;
                 queue.addFiles(files, config);
             }
         });
@@ -320,6 +326,14 @@ public class Plupload extends Button {
         return this.addDropZone(component.getId());
     }
 
+    public boolean isSaveFileOnDiskEnabled() {
+        return saveFileOnDisk;
+    }
+
+    public void setSaveFileOnDiskEnabled(boolean saveFileOnDisk) {
+        this.saveFileOnDisk = saveFileOnDisk;
+    }
+
     public Plupload setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
         this.getClient().setOption(Option.MAX_FILE_SIZE.toString(), maxFileSize);
@@ -431,6 +445,8 @@ public class Plupload extends Button {
 
     private final Set<FileUploadedListener> fileUploadedListeners = new LinkedHashSet<>();
 
+    private final Set<ChunkUploadedListener> chunkUploadedListeners = new LinkedHashSet<>();
+
     private final Set<ErrorListener> errorListeners = new LinkedHashSet<>();
 
     private final Set<DestroyListener> destroyListeners = new LinkedHashSet<>();
@@ -460,6 +476,11 @@ public class Plupload extends Button {
 
     public Plupload addFileUploadedListener(FileUploadedListener listener) {
         this.fileUploadedListeners.add(listener);
+        return this;
+    }
+
+    public Plupload addChunkUploadedListener(ChunkUploadedListener listener) {
+        this.chunkUploadedListeners.add(listener);
         return this;
     }
 
@@ -518,6 +539,11 @@ public class Plupload extends Button {
         return this;
     }
 
+    public Plupload removeChunkUploadedListener(ChunkUploadedListener listener) {
+        this.chunkUploadedListeners.remove(listener);
+        return this;
+    }
+
     public Plupload removeUploadProgressListener(UploadProgressListener listener) {
         this.uploadProgressListeners.remove(listener);
         return this;
@@ -566,6 +592,11 @@ public class Plupload extends Button {
     public interface FileFilteredListener extends Serializable {
 
         void onFileFiltered(PluploadFile file);
+    }
+
+    public interface ChunkUploadedListener extends Serializable {
+
+        void onChunkUploaded(PluploadChunk chunk);
     }
 
     public interface FileUploadedListener extends Serializable {

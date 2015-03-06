@@ -31,13 +31,16 @@ import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import pl.exsio.plupload.Plupload.ChunkUploadedListener;
 
 /**
  *
@@ -90,9 +93,19 @@ public class PluploadReceiver implements RequestHandler, Serializable {
                             ServletFileUpload upload = new ServletFileUpload();
                             FileItemIterator items = upload.getItemIterator(req);
                             PluploadChunk chunk = PluploadChunkFactory.create(items);
-                            File targetFile = PluploadFileAppender.append(chunk);
+                            String fileId = chunk.getFileId();
+                            if (this.saveExpectedFileOnDisk(fileId)) {
+                                File targetFile = PluploadFileAppender.append(chunk);
+                                if (chunk.isLast()) {
+                                    this.uploadedFiles.put(chunk.getFileId(), targetFile);
+                                }
+                            }
+
+                            for (ChunkUploadedListener listener : this.getExpectedFileChunkUploadedListeners(fileId).get()) {
+                                listener.onChunkUploaded(chunk);
+                            }
+
                             if (chunk.isLast()) {
-                                this.uploadedFiles.put(chunk.getFileId(), targetFile);
                                 response.getWriter().append("file " + chunk.getName() + " uploaded successfuly");
                             } else {
                                 response.getWriter().append("file chunk " + (chunk.getChunk() + 1) + " of " + chunk.getChunks() + " uploaded successfuly");
@@ -114,6 +127,22 @@ public class PluploadReceiver implements RequestHandler, Serializable {
     public String getExpectedFilePath(String fileId) {
         if (this.isFileExpected(fileId)) {
             return this.expectedFileIds.get(fileId).uploadPath;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean saveExpectedFileOnDisk(String fileId) {
+        if (this.isFileExpected(fileId)) {
+            return this.expectedFileIds.get(fileId).saveFileOnDisk;
+        } else {
+            return false;
+        }
+    }
+
+    public WeakReference<Set<ChunkUploadedListener>> getExpectedFileChunkUploadedListeners(String fileId) {
+        if (this.isFileExpected(fileId)) {
+            return this.expectedFileIds.get(fileId).chunkUploadedListeners;
         } else {
             return null;
         }
