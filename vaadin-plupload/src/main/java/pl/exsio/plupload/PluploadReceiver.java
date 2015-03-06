@@ -47,7 +47,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
 
     public static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
 
-    private final Map<String, String> expectedFileIds = Collections.synchronizedMap(new HashMap());
+    private final Map<String, PluploadFileConfig> expectedFileIds = Collections.synchronizedMap(new HashMap());
 
     private final Map<String, File> uploadedFiles = Collections.synchronizedMap(new HashMap());
 
@@ -89,9 +89,10 @@ public class PluploadReceiver implements RequestHandler, Serializable {
                         synchronized (this) {
                             ServletFileUpload upload = new ServletFileUpload();
                             FileItemIterator items = upload.getItemIterator(req);
-                            PluploadChunk chunk = PluploadAppender.appendData(items);
+                            PluploadChunk chunk = PluploadChunkFactory.create(items);
+                            File targetFile = PluploadFileAppender.append(chunk);
                             if (chunk.isLast()) {
-                                this.uploadedFiles.put(chunk.getFileId(), chunk.getFile());
+                                this.uploadedFiles.put(chunk.getFileId(), targetFile);
                                 response.getWriter().append("file " + chunk.getName() + " uploaded successfuly");
                             } else {
                                 response.getWriter().append("file chunk " + (chunk.getChunk() + 1) + " of " + chunk.getChunks() + " uploaded successfuly");
@@ -112,7 +113,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
 
     public String getExpectedFilePath(String fileId) {
         if (this.isFileExpected(fileId)) {
-            return this.expectedFileIds.get(fileId);
+            return this.expectedFileIds.get(fileId).uploadPath;
         } else {
             return null;
         }
@@ -122,8 +123,8 @@ public class PluploadReceiver implements RequestHandler, Serializable {
         return this.expectedFileIds.containsKey(fileId);
     }
 
-    public void addExpectedFile(String fileId, String path) {
-        this.expectedFileIds.put(fileId, path);
+    public void addExpectedFile(String fileId, PluploadFileConfig config) {
+        this.expectedFileIds.put(fileId, config);
     }
 
     public void removeExpectedFile(String fileId) {

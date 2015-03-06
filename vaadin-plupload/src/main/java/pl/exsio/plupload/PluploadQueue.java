@@ -59,14 +59,14 @@ public class PluploadQueue implements Serializable {
         this.queue.clear();
     }
 
-    public void addFile(PluploadFile file, String uploadPath) {
+    public void addFile(PluploadFile file, PluploadFileConfig config) {
         this.queue.put(file.getId(), file);
-        getReceiver().addExpectedFile(file.getId(), uploadPath);
+        getReceiver().addExpectedFile(file.getId(), config);
     }
 
-    public void addFiles(PluploadFile[] files, String uploadPath) {
+    public void addFiles(PluploadFile[] files, PluploadFileConfig config) {
         for (PluploadFile file : files) {
-            this.addFile(file, uploadPath);
+            this.addFile(file, config);
         }
     }
 

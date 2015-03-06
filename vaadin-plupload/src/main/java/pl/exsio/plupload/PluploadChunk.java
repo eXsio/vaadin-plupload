@@ -24,6 +24,7 @@
 package pl.exsio.plupload;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 
 /**
@@ -40,13 +41,13 @@ public class PluploadChunk implements Serializable {
 
     protected int chunks;
 
-    protected File file;
+    protected InputStream inputStream;
 
     public String getFileId() {
         return fileId;
     }
 
-    public PluploadChunk setFileId(String fileId) {
+    PluploadChunk setFileId(String fileId) {
         this.fileId = fileId;
         return this;
     }
@@ -55,7 +56,7 @@ public class PluploadChunk implements Serializable {
         return name;
     }
 
-    public PluploadChunk setName(String name) {
+    PluploadChunk setName(String name) {
         this.name = name;
         return this;
     }
@@ -64,7 +65,7 @@ public class PluploadChunk implements Serializable {
         return chunk;
     }
 
-    public PluploadChunk setChunk(int chunk) {
+    PluploadChunk setChunk(int chunk) {
         this.chunk = chunk;
         return this;
     }
@@ -73,17 +74,17 @@ public class PluploadChunk implements Serializable {
         return chunks;
     }
 
-    public PluploadChunk setChunks(int chunks) {
+    PluploadChunk setChunks(int chunks) {
         this.chunks = chunks;
         return this;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public InputStream getInputStream() {
+        return inputStream;
     }
 
-    public File getFile() {
-        return file;
+    void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     public boolean isLast() {

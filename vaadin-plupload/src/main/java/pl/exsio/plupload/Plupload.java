@@ -176,7 +176,9 @@ public class Plupload extends Button {
 
             @Override
             public void onFilesAdded(PluploadFile[] files) {
-                queue.addFiles(files, uploadPath);
+                PluploadFileConfig config = new PluploadFileConfig();
+                config.uploadPath = uploadPath;
+                queue.addFiles(files, config);
             }
         });
     }

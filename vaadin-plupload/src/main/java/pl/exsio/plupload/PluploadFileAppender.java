@@ -28,59 +28,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.util.Streams;
 
 /**
  *
  * @author exsio
  */
-public abstract class PluploadAppender implements Serializable {
+public abstract class PluploadFileAppender implements Serializable {
 
-    public static PluploadChunk appendData(FileItemIterator items) throws IOException, FileUploadException {
-        PluploadChunk chunk = new PluploadChunk();
-        while (items.hasNext()) {
-            FileItemStream item = (FileItemStream) items.next();
-
-            if (item.isFormField()) {
-                setChunkField(chunk, item);
-            } else {
-                saveChunkData(chunk, item);
-            }
-        }
-        return chunk;
-    }
-
-    private static void setChunkField(PluploadChunk chunk, FileItemStream item) throws NumberFormatException, IOException {
-        String value = Streams.asString(item.openStream());
-        switch (item.getFieldName()) {
-            case "fileId":
-                chunk.setFileId(value);
-                break;
-            case "name":
-                chunk.setName(value);
-                break;
-            case "chunk":
-                chunk.setChunk(Integer.parseInt(value));
-                break;
-            case "chunks":
-                chunk.setChunks(Integer.parseInt(value));
-        }
-    }
-
-    private static void saveChunkData(PluploadChunk chunk, FileItemStream item) throws IOException {
-        if (getReceiver().isFileExpected(chunk.getFileId())) {
-            String uploadedFileName = getFileName(chunk);
-            String filePath = getFilePath(chunk, uploadedFileName);
-            try (InputStream input = item.openStream();
-                    FileOutputStream output = new FileOutputStream(filePath, true)) {
-                copyInputStreamToOutputStream(input, output);
+    public static File append(PluploadChunk chunk) throws IOException, FileUploadException {
+        String uploadedFileName = getFileName(chunk);
+        String filePath = getFilePath(chunk, uploadedFileName);
+        if (chunk.getInputStream() != null) {
+            try (FileOutputStream output = new FileOutputStream(filePath, true)) {
+                copyInputStreamToOutputStream(chunk.getInputStream(), output);
                 output.close();
             }
-            chunk.setFile(new File(filePath));
+
         }
+        return new File(filePath);
     }
 
     private static String getFilePath(PluploadChunk chunk, String uploadedFileName) {
