@@ -26,9 +26,9 @@ package pl.exsio.plupload;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import org.apache.commons.fileupload.FileUploadException;
+import pl.exsio.plupload.util.PluploadUtil;
 
 /**
  *
@@ -41,7 +41,7 @@ public abstract class PluploadFileAppender implements Serializable {
         String filePath = getFilePath(chunk, uploadedFileName);
         if (chunk.getInputStream() != null) {
             try (FileOutputStream output = new FileOutputStream(filePath, true)) {
-                copyInputStreamToOutputStream(chunk.getInputStream(), output);
+                PluploadUtil.copyInputStreamToOutputStream(chunk.getInputStream(), output);
                 output.close();
             }
 
@@ -51,14 +51,6 @@ public abstract class PluploadFileAppender implements Serializable {
 
     private static String getFilePath(PluploadChunk chunk, String uploadedFileName) {
         return getReceiver().getExpectedFilePath(chunk.getFileId()) + File.separator + uploadedFileName;
-    }
-
-    private static void copyInputStreamToOutputStream(InputStream input, final FileOutputStream output) throws IOException {
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = input.read(buffer)) != -1) {
-            output.write(buffer, 0, bytesRead);
-        }
     }
 
     protected static PluploadReceiver getReceiver() {

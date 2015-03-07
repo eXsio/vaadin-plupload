@@ -91,4 +91,8 @@ public class PluploadChunk implements Serializable {
         return this.chunk + 1 == this.chunks;
     }
 
+    public boolean isFirst() {
+        return this.chunk == 0;
+    }
+
 }

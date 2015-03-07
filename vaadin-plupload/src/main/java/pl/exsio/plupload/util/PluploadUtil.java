@@ -23,6 +23,9 @@
  */
 package pl.exsio.plupload.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
@@ -42,4 +45,13 @@ public class PluploadUtil implements Serializable {
         }
 
     }
+
+    public static void copyInputStreamToOutputStream(InputStream input, OutputStream output) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
+
 }

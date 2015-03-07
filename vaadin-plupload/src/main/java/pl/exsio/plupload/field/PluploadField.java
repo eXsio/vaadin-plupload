@@ -33,19 +33,22 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 import pl.exsio.plupload.Plupload;
+import pl.exsio.plupload.PluploadChunk;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.ex.UnsupportedFieldTypeException;
+import pl.exsio.plupload.util.PluploadUtil;
 import static pl.exsio.plupload.util.PluploadUtil.trimTextInTheMiddle;
 
 /**
  *
  * @author exsio
+ * @param <T>
  */
 public class PluploadField<T extends Object> extends CustomField<T> {
 
@@ -68,6 +71,8 @@ public class PluploadField<T extends Object> extends CustomField<T> {
     protected PluploadFile currentFile;
 
     protected PluploadFile newFile;
+
+    protected ByteArrayOutputStream bos;
 
     public PluploadField(Class<T> returnTypeClass) {
         if (!byte[].class.equals(returnTypeClass) && !File.class.equals(returnTypeClass)) {
@@ -125,26 +130,46 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.handleFilesRemoved();
         this.handleUploadProgress();
         this.handleFileUploaded();
+        this.handleChunkUploaded();
 
     }
 
     private void handleFileUploaded() {
-        this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
+        if (File.class.equals(this.returnTypeClass)) {
+            this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
 
-            @Override
-            public void onFileUploaded(PluploadFile file) {
-                if (File.class.equals(returnTypeClass)) {
+                @Override
+                public void onFileUploaded(PluploadFile file) {
                     setValue((T) file.getUploadedFile());
-                } else {
+                }
+            });
+        }
+    }
+
+    private void handleChunkUploaded() {
+        if (byte[].class.equals(this.returnTypeClass)) {
+            this.uploader.setSaveFileOnDiskEnabled(false);
+            this.uploader.addChunkUploadedListener(new Plupload.ChunkUploadedListener() {
+
+                @Override
+                public void onChunkUploaded(PluploadChunk chunk) {
                     try {
-                        setValue((T) FileUtils.readFileToByteArray(file.getUploadedFile()));
+                        if (chunk.isFirst()) {
+                            bos = new ByteArrayOutputStream();
+                        }
+                        PluploadUtil.copyInputStreamToOutputStream(chunk.getInputStream(), bos);
+                        if (chunk.isLast()) {
+                            setValue((T) bos.toByteArray());
+                            bos = null;
+                        }
                     } catch (IOException ex) {
                         setValue(null);
                         Logger.getLogger(PluploadField.class.getName()).log(Level.SEVERE, null, ex);
                     }
+
                 }
-            }
-        });
+            });
+        }
     }
 
     private void handleUploadProgress() {
@@ -221,6 +246,8 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
     /**
      * Set the browse button's label. Defaults to "Browse".
+     *
+     * @param browseLabel
      */
     public void setBrowseLabel(String browseLabel) {
         this.browseLabel = browseLabel;
@@ -231,6 +258,8 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
     /**
      * Set the remove button's label. Defaults to a empty String.
+     *
+     * @param removeLabel
      */
     public void setRemoveLabel(String removeLabel) {
         this.removeLabel = removeLabel;
