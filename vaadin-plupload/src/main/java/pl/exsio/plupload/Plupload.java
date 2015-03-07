@@ -157,10 +157,9 @@ public class Plupload extends Button {
             @Override
             public void onFileUploaded(PluploadFile file) {
                 File uploadedFile = receiver.retrieveUploadedFile(file.getId());
-                if (uploadedFile != null) {
-                    queue.setUploadedFile(file.getId(), uploadedFile);
-                    file.setUploadedFile(uploadedFile);
-                }
+                queue.setUploadedFile(file.getId(), uploadedFile);
+                file.setUploadedFile(uploadedFile);
+                file.setUploaded(true);
             }
         });
     }

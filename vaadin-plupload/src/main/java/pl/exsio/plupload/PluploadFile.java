@@ -51,8 +51,15 @@ public class PluploadFile implements Serializable {
 
     protected String name;
 
+    protected boolean uploaded = false;
+
     protected transient File uploadedFile;
 
+    /**
+     * Get percentage of upload progress
+     *
+     * @return
+     */
     public int getPercent() {
         return percent;
     }
@@ -61,6 +68,11 @@ public class PluploadFile implements Serializable {
         this.percent = percent;
     }
 
+    /**
+     * Get unique Id of the file
+     *
+     * @return
+     */
     public String getId() {
         return id;
     }
@@ -69,6 +81,11 @@ public class PluploadFile implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Gget the last modified date of the file
+     *
+     * @return
+     */
     public String getLastModifiedDate() {
         return lastModifiedDate;
     }
@@ -77,6 +94,11 @@ public class PluploadFile implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    /**
+     * Get original size of the file (in bytes)
+     *
+     * @return
+     */
     public long getOrigSize() {
         return origSize;
     }
@@ -85,6 +107,11 @@ public class PluploadFile implements Serializable {
         this.origSize = origSize;
     }
 
+    /**
+     * Get current size of the file (in bytes)
+     *
+     * @return
+     */
     public long getSize() {
         return size;
     }
@@ -93,6 +120,11 @@ public class PluploadFile implements Serializable {
         this.size = size;
     }
 
+    /**
+     * Get current status of the file according to client-side Plupload library
+     *
+     * @return
+     */
     public int getStatus() {
         return status;
     }
@@ -101,6 +133,11 @@ public class PluploadFile implements Serializable {
         this.status = status;
     }
 
+    /**
+     * Get mime-type of the file
+     *
+     * @return
+     */
     public String getType() {
         return type;
     }
@@ -109,6 +146,11 @@ public class PluploadFile implements Serializable {
         this.type = type;
     }
 
+    /**
+     * Get uploaded bytes
+     *
+     * @return
+     */
     public long getLoaded() {
         return loaded;
     }
@@ -117,6 +159,11 @@ public class PluploadFile implements Serializable {
         this.loaded = loaded;
     }
 
+    /**
+     * Get file name
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
@@ -125,6 +172,11 @@ public class PluploadFile implements Serializable {
         this.name = name;
     }
 
+    /**
+     * Get the associated java.io.File instance, that was saved on the server
+     *
+     * @return
+     */
     public File getUploadedFile() {
         return uploadedFile;
     }
@@ -133,7 +185,25 @@ public class PluploadFile implements Serializable {
         this.uploadedFile = uploadedFile;
     }
 
+    /**
+     * Check, if the file was uploaded
+     *
+     * @return
+     */
     public boolean isUploaded() {
+        return this.uploaded;
+    }
+
+    void setUploaded(boolean uploaded) {
+        this.uploaded = uploaded;
+    }
+
+    /**
+     * Check, if the file contains associated java.io.File saved on the server
+     *
+     * @return
+     */
+    public boolean hasUploadedFile() {
         return this.uploadedFile != null;
     }
 

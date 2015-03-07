@@ -90,6 +90,7 @@ public class PluploadQueue implements Serializable {
     public void setUploadedFile(String fileId, File uploadedFile) {
         if (this.queue.containsKey(fileId)) {
             this.queue.get(fileId).setUploadedFile(uploadedFile);
+            this.queue.get(fileId).setUploaded(true);
         }
     }
 

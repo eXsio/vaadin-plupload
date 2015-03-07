@@ -73,18 +73,38 @@ public class PluploadError implements Serializable {
         }
     }
 
+    /**
+     * Get Plupload error code
+     *
+     * @return
+     */
     public int getCode() {
         return code;
     }
 
+    /**
+     * Get PluploadFile associated with this error
+     *
+     * @return
+     */
     public PluploadFile getFile() {
         return file;
     }
 
+    /**
+     * Get error message
+     *
+     * @return
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Get error Type
+     *
+     * @return
+     */
     public Type getType() {
         return type;
     }

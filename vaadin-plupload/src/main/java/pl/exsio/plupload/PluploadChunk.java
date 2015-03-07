@@ -43,6 +43,11 @@ public class PluploadChunk implements Serializable {
 
     protected InputStream inputStream;
 
+    /**
+     * Get unique file id
+     *
+     * @return
+     */
     public String getFileId() {
         return fileId;
     }
@@ -52,6 +57,11 @@ public class PluploadChunk implements Serializable {
         return this;
     }
 
+    /**
+     * Get the file name
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
@@ -61,6 +71,11 @@ public class PluploadChunk implements Serializable {
         return this;
     }
 
+    /**
+     * Get current chunk number
+     *
+     * @return
+     */
     public int getChunk() {
         return chunk;
     }
@@ -70,6 +85,11 @@ public class PluploadChunk implements Serializable {
         return this;
     }
 
+    /**
+     * Get overall number of chunks
+     *
+     * @return
+     */
     public int getChunks() {
         return chunks;
     }
@@ -79,6 +99,13 @@ public class PluploadChunk implements Serializable {
         return this;
     }
 
+    /**
+     * Get the InputStream with chunk data. This stream will only be valid in
+     * the current request scope. Do not trey to serialize it/save it for use in
+     * the future.
+     *
+     * @return
+     */
     public InputStream getInputStream() {
         return inputStream;
     }
@@ -87,10 +114,20 @@ public class PluploadChunk implements Serializable {
         this.inputStream = inputStream;
     }
 
+    /**
+     * Check if this is a last chunk
+     *
+     * @return
+     */
     public boolean isLast() {
         return this.chunk + 1 == this.chunks;
     }
 
+    /**
+     * Check if this is a first chunk
+     *
+     * @return
+     */
     public boolean isFirst() {
         return this.chunk == 0;
     }

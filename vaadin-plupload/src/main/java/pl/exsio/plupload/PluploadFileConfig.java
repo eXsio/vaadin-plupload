@@ -23,6 +23,7 @@
  */
 package pl.exsio.plupload;
 
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 import pl.exsio.plupload.Plupload.ChunkUploadedListener;
@@ -31,11 +32,11 @@ import pl.exsio.plupload.Plupload.ChunkUploadedListener;
  *
  * @author sdymi_000
  */
-public class PluploadFileConfig {
+public class PluploadFileConfig implements Serializable {
 
     public String uploadPath;
 
     public boolean saveFileOnDisk;
 
-    public WeakReference<Set<ChunkUploadedListener>> chunkUploadedListeners;
+    public transient WeakReference<Set<ChunkUploadedListener>> chunkUploadedListeners;
 }
