@@ -101,7 +101,7 @@ public class PluploadChunk implements Serializable {
 
     /**
      * Get the InputStream with chunk data. This stream will only be valid in
-     * the current request scope. Do not trey to serialize it/save it for use in
+     * the current request scope. Do not try to serialize it/save it for use in
      * the future.
      *
      * @return
