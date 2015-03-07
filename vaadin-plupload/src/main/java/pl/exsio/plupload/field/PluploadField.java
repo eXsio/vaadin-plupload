@@ -74,6 +74,12 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
     protected ByteArrayOutputStream bos;
 
+    /**
+     * While constructing an instance of PluploadFIeld class, You have to decide
+     * whether the value of this instance will be File or byte[].
+     *
+     * @param returnTypeClass
+     */
     public PluploadField(Class<T> returnTypeClass) {
         if (!byte[].class.equals(returnTypeClass) && !File.class.equals(returnTypeClass)) {
             throw new UnsupportedFieldTypeException("The types supported by this field are byte[] and java.io.File.");
@@ -120,6 +126,11 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         return layout;
     }
 
+    /**
+     * Returns an instance of Plupload class in order to reconfigure/ehnance it
+     *
+     * @return
+     */
     public Plupload getUploader() {
         return this.uploader;
     }
@@ -257,7 +268,7 @@ public class PluploadField<T extends Object> extends CustomField<T> {
     }
 
     /**
-     * Set the remove button's label. Defaults to a empty String.
+     * Set the remove button's label. Defaults to an empty String.
      *
      * @param removeLabel
      */

@@ -267,52 +267,110 @@ public class Plupload extends Button {
         }
     };
 
+    /**
+     * Disable the browse button on the client side
+     *
+     * @param disable
+     * @return
+     */
     public Plupload disableBrowse(boolean disable) {
         this.getClient().disableBrowse(disable);
         return this;
     }
 
+    /**
+     * Remove a file from the upload queue
+     *
+     * @param fileId
+     * @return
+     */
     public Plupload removeFile(String fileId) {
         this.getClient().removeFile(fileId);
         return this;
     }
 
+    /**
+     * Add new Filter to the Uploader
+     *
+     * @param filter
+     * @return
+     */
     public Plupload addFilter(PluploadFilter filter) {
         this.filters.add(filter);
         this.getClient().setOption(Option.FILTERS.toString(), new Gson().toJson(this.filters));
         return this;
     }
 
+    /**
+     * Remove a Filter from the Uploader
+     *
+     * @param filter
+     * @return
+     */
     public Plupload removeFilter(PluploadFilter filter) {
         this.filters.remove(filter);
         this.getClient().setOption(Option.FILTERS.toString(), new Gson().toJson(this.filters));
         return this;
     }
 
+    /**
+     * Return an array of currently active Uploader Filters
+     *
+     * @return
+     */
     public PluploadFilter[] getFilters() {
         return this.filters.get();
     }
 
+    /**
+     * Return current configuration of client-side Image resizing
+     *
+     * @return
+     */
     public PluploadImageResize getImageResize() {
         return this.resize;
     }
 
+    /**
+     * Set the new configuration of client-size Image resizing
+     *
+     * @param resize
+     * @return
+     */
     public Plupload setImageResize(PluploadImageResize resize) {
         this.resize = resize;
         this.getClient().setOption(Option.RESIZE.toString(), new Gson().toJson(resize));
         return this;
     }
 
+    /**
+     * Set the desired Chunk size. Defaults to "1mb"
+     *
+     * @param chunkSize
+     * @return
+     */
     public Plupload setChunkSize(String chunkSize) {
         this.chunkSize = chunkSize;
         this.getClient().setOption(Option.CHUNK_SIZE.toString(), chunkSize);
         return this;
     }
 
+    /**
+     * Get the currently configured Chunk size
+     *
+     * @return
+     */
     public String getChunkSize() {
         return this.chunkSize;
     }
 
+    /**
+     * Add additional drop zone by it's Id. The Id cannot be empty and must be
+     * unique.
+     *
+     * @param dropZoneId
+     * @return
+     */
     public Plupload addDropZone(String dropZoneId) {
         if (dropZoneId != null && !"".equals(dropZoneId)) {
             this.getClient().addDropZone(dropZoneId);
@@ -322,62 +380,136 @@ public class Plupload extends Button {
         }
     }
 
+    /**
+     * Add additional drop zone by component. The component must have an
+     * non-empty and unique Id.
+     *
+     * @param component
+     * @return
+     */
     public Plupload addDropZone(AbstractComponent component) {
         return this.addDropZone(component.getId());
     }
 
+    /**
+     * Check, if saving uploaded files on disk is enabled
+     *
+     * @return
+     */
     public boolean isSaveFileOnDiskEnabled() {
         return saveFileOnDisk;
     }
 
+    /**
+     * Decide, if the uploaded files are to be saved on disk. Defaults to true
+     *
+     * @param saveFileOnDisk
+     */
     public void setSaveFileOnDiskEnabled(boolean saveFileOnDisk) {
         this.saveFileOnDisk = saveFileOnDisk;
     }
 
+    /**
+     * Set maximum file size accepted by this Uploader. Defaults to "1000mb"
+     *
+     * @param maxFileSize
+     * @return
+     */
     public Plupload setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
         this.getClient().setOption(Option.MAX_FILE_SIZE.toString(), maxFileSize);
         return this;
     }
 
+    /**
+     * Get currently configured maximum file size accepred by this Uploader
+     *
+     * @return
+     */
     public String getMaxFileSize() {
         return this.maxFileSize;
     }
 
+    /**
+     * Get currently configured duplicates prevention setting
+     *
+     * @return
+     */
     public boolean isPreventDuplicates() {
         return this.preventDuplicates;
     }
 
+    /**
+     * Decide, whether the Upoader should prevend adding duplicate copies of the
+     * same file to the queue. Defaults to false
+     *
+     * @param prevent
+     * @return
+     */
     public Plupload setPreventDuplicates(boolean prevent) {
         this.preventDuplicates = prevent;
         this.getClient().setOption(Option.PREVENT_DUPLICATES.toString(), Boolean.toString(prevent));
         return this;
     }
 
+    /**
+     * Decide how many times the Uploader shoud retry sending of the Chunk.
+     * Defaults to 5
+     *
+     * @param maxRetries
+     * @return
+     */
     public Plupload setMaxRetries(int maxRetries) {
         this.maxRetries = maxRetries;
         this.getClient().setOption(Option.MAX_RETRIES.toString(), Integer.toString(maxRetries));
         return this;
     }
 
+    /**
+     * Return currently configured max retries option
+     *
+     * @return
+     */
     public int getMaxRetries() {
         return this.maxRetries;
     }
 
+    /**
+     * Decide, if user should be able to select multiple files in the Browse
+     * window. Defaults to true
+     *
+     * @param multiSelection
+     * @return
+     */
     public Plupload setMultiSelection(boolean multiSelection) {
         this.multiSelection = multiSelection;
         this.getClient().setOption(Option.MULTI_SELECTION.toString(), Boolean.toString(multiSelection));
         return this;
     }
 
+    /**
+     * Check, if user can select multiple files in the Browse window
+     *
+     * @return
+     */
     public boolean isMultiSelection() {
         return this.multiSelection;
     }
 
+    /**
+     * Get an uniqie uploader key
+     *
+     * @return
+     */
     public String getUploaderKey() {
         return uploaderKey;
     }
 
+    /**
+     * Start the upload process
+     *
+     * @return
+     */
     public Plupload start() {
 
         if (!this.queue.isEmpty() && !this.uploadStarted) {
@@ -390,35 +522,73 @@ public class Plupload extends Button {
         return this;
     }
 
+    /**
+     * Refresh the client-side uploader
+     *
+     * @return
+     */
     public Plupload refresh() {
         this.getClient().refresh();
         return this;
     }
 
+    /**
+     * Destroy the client side uploder. After calling this method the uploader
+     * is no longer usable
+     *
+     * @return
+     */
     public Plupload destroy() {
         this.getClient().destroy();
         return this;
     }
 
+    /**
+     * Get files uploaded by this Uploader
+     *
+     * @return
+     */
     public PluploadFile[] getUploadedFiles() {
         Set<PluploadFile> files = this.queue.getPluploadFiles(PluploadQueue.Mode.UPLOADED);
         return files.toArray(new PluploadFile[files.size()]);
     }
 
+    /**
+     * Get files, that were added to the queue but not yet uploaded
+     *
+     * @return
+     */
     public PluploadFile[] getQueuedFiles() {
         Set<PluploadFile> files = this.queue.getPluploadFiles(PluploadQueue.Mode.NOT_UPLOADED);
         return files.toArray(new PluploadFile[files.size()]);
     }
 
+    /**
+     * Get the currently configured destination for uploaded files
+     *
+     * @return
+     */
     public String getUploadPath() {
         return uploadPath;
     }
 
+    /**
+     * Set the destination for uploaded files. Defaults to the value of
+     * "java.io.tmpdir" System property
+     *
+     * @param uploadPath
+     * @return
+     */
     public Plupload setUploadPath(String uploadPath) {
         this.uploadPath = uploadPath;
         return this;
     }
 
+    /**
+     * Stops the current upload process
+     *
+     * @return
+     */
     public Plupload stop() {
 
         if (this.uploadStarted) {
