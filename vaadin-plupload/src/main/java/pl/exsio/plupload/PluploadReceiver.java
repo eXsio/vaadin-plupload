@@ -31,16 +31,15 @@ import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import pl.exsio.plupload.Plupload.ChunkUploadedListener;
+import pl.exsio.plupload.ex.InvalidFileHandlerException;
+import pl.exsio.plupload.handler.PluploadChunkHandler;
 
 /**
  *
@@ -50,9 +49,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
 
     public static final String UPLOAD_ACTION_PATH = "pluploader-upload-action";
 
-    private final Map<String, PluploadFileConfig> expectedFileIds = Collections.synchronizedMap(new HashMap());
-
-    private final Map<String, File> uploadedFiles = Collections.synchronizedMap(new HashMap());
+    private final Map<String, PluploadChunkHandler> expectedFiles = Collections.synchronizedMap(new HashMap());
 
     private PluploadReceiver() {
     }
@@ -70,17 +67,6 @@ public class PluploadReceiver implements RequestHandler, Serializable {
         return receiver;
     }
 
-    public synchronized File retrieveUploadedFile(String fileId) {
-        if (this.uploadedFiles.containsKey(fileId)) {
-            File file = this.uploadedFiles.get(fileId);
-            this.uploadedFiles.remove(fileId);
-            expectedFileIds.remove(fileId);
-            return file;
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
         if (request.getPathInfo() != null && request.getPathInfo().endsWith(UPLOAD_ACTION_PATH)) {
@@ -93,12 +79,11 @@ public class PluploadReceiver implements RequestHandler, Serializable {
                             ServletFileUpload upload = new ServletFileUpload();
                             FileItemIterator items = upload.getItemIterator(req);
                             PluploadChunk chunk = PluploadChunkFactory.create(items);
-                            String fileId = chunk.getFileId();
-                            this.saveExpectedFileIfApropriate(fileId, chunk);
-                            this.sendChunkUploadedEvent(fileId, chunk);
+                            PluploadChunkHandler fileHandler = this.getExpectedFileHandler(chunk.getFileId());
+                            fileHandler.handleUploadedChunk(chunk);
                             this.writeResponse(chunk, response);
                         }
-                    } catch (FileUploadException ex) {
+                    } catch (Exception ex) {
                         response.getWriter().append("file upload unsuccessful");
                         throw new IOException(ex);
                     }
@@ -119,59 +104,24 @@ public class PluploadReceiver implements RequestHandler, Serializable {
         response.setContentType("text/plain");
     }
 
-    protected void sendChunkUploadedEvent(String fileId, PluploadChunk chunk) {
-        for (ChunkUploadedListener listener : this.getExpectedFileChunkUploadedListeners(fileId).get()) {
-            listener.onChunkUploaded(chunk);
-        }
-    }
-
-    protected void saveExpectedFileIfApropriate(String fileId, PluploadChunk chunk) throws IOException, FileUploadException {
-        if (this.saveExpectedFileOnDisk(fileId)) {
-            File targetFile = PluploadFileAppender.append(chunk);
-            if (chunk.isLast()) {
-                this.uploadedFiles.put(chunk.getFileId(), targetFile);
-            }
-        }
-    }
-
-    protected String getExpectedFilePath(String fileId) {
+    protected PluploadChunkHandler getExpectedFileHandler(String fileId) {
         if (this.isFileExpected(fileId)) {
-            return this.expectedFileIds.get(fileId).uploadPath;
+            return this.expectedFiles.get(fileId);
         } else {
-            return null;
-        }
-    }
-
-    protected boolean saveExpectedFileOnDisk(String fileId) {
-        if (this.isFileExpected(fileId)) {
-            return this.expectedFileIds.get(fileId).saveFileOnDisk;
-        } else {
-            return false;
-        }
-    }
-
-    protected WeakReference<Set<ChunkUploadedListener>> getExpectedFileChunkUploadedListeners(String fileId) {
-        if (this.isFileExpected(fileId)) {
-            return this.expectedFileIds.get(fileId).chunkUploadedListeners;
-        } else {
-            return null;
+            throw new InvalidFileHandlerException("There is no PluploadChunkHandler configured for file " + fileId);
         }
     }
 
     public boolean isFileExpected(String fileId) {
-        return this.expectedFileIds.containsKey(fileId);
+        return this.expectedFiles.containsKey(fileId);
     }
 
-    public void addExpectedFile(String fileId, PluploadFileConfig config) {
-        this.expectedFileIds.put(fileId, config);
+    public void addExpectedFile(String fileId, PluploadChunkHandler fileHandler) {
+        this.expectedFiles.put(fileId, fileHandler);
     }
 
     public void removeExpectedFile(String fileId) {
-        this.expectedFileIds.remove(fileId);
-    }
-
-    protected Map<String, File> getUploadedFiles() {
-        return uploadedFiles;
+        this.expectedFiles.remove(fileId);
     }
 
 }

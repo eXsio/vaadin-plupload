@@ -21,22 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.plupload;
 
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
-import java.util.Set;
-import pl.exsio.plupload.Plupload.ChunkUploadedListener;
+package pl.exsio.plupload.handler.file;
+
+import pl.exsio.plupload.Plupload;
+import pl.exsio.plupload.PluploadFile;
+import pl.exsio.plupload.handler.PluploadChunkHandler;
+import pl.exsio.plupload.handler.PluploadChunkHandlerFactory;
 
 /**
  *
- * @author sdymi_000
+ * @author eXsio
  */
-public class PluploadFileConfig implements Serializable {
+public class FileAppendingChunkHandlerFactory implements PluploadChunkHandlerFactory {
 
-    public String uploadPath;
-
-    public boolean saveFileOnDisk;
-
-    public transient WeakReference<Set<ChunkUploadedListener>> chunkUploadedListeners;
+    protected String uploadPath;
+    
+    public FileAppendingChunkHandlerFactory(String uploadPath) {
+        this.uploadPath = uploadPath;
+    }
+    
+    @Override
+    public PluploadChunkHandler create(PluploadFile file, Plupload uploader) {
+        return new FileAppendingChunkHandler(this.uploadPath);
+    }
+    
 }

@@ -31,7 +31,6 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import java.io.File;
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -41,6 +40,8 @@ import pl.exsio.plupload.client.PluploadCilentRpc;
 import pl.exsio.plupload.shared.PluploadState;
 import pl.exsio.plupload.client.PluploadServerRpc;
 import pl.exsio.plupload.ex.InvalidDropZoneIdException;
+import pl.exsio.plupload.handler.PluploadChunkHandlerFactory;
+import pl.exsio.plupload.handler.file.FileAppendingChunkHandlerFactory;
 import pl.exsio.plupload.helper.filter.PluploadFilters;
 import pl.exsio.plupload.helper.resize.PluploadImageResize;
 
@@ -59,11 +60,11 @@ public class Plupload extends Button {
 
     protected final PluploadReceiver receiver = PluploadReceiver.getInstance();
 
-    protected String uploadPath = System.getProperty("java.io.tmpdir");
-
     protected final PluploadFilters filters = new PluploadFilters();
 
     protected PluploadImageResize resize = new PluploadImageResize();
+
+    protected PluploadChunkHandlerFactory chunkHandlerFactory = new FileAppendingChunkHandlerFactory(System.getProperty("java.io.tmpdir"));
 
     protected String chunkSize = "1mb";
 
@@ -72,8 +73,6 @@ public class Plupload extends Button {
     protected boolean multiSelection = true;
 
     protected boolean preventDuplicates = false;
-
-    protected boolean saveFileOnDisk = true;
 
     protected int maxRetries = 3;
 
@@ -156,7 +155,7 @@ public class Plupload extends Button {
 
             @Override
             public void onFileUploaded(PluploadFile file) {
-                File uploadedFile = receiver.retrieveUploadedFile(file.getId());
+                Object uploadedFile = queue.getFileHandler(file.getId()).getUploadedFile();
                 queue.setUploadedFile(file.getId(), uploadedFile);
                 file.setUploadedFile(uploadedFile);
                 file.setUploaded(true);
@@ -175,15 +174,14 @@ public class Plupload extends Button {
     }
 
     private void handleFilesAdded() {
+        final Plupload self = this;
         this.addFilesAddedListener(new FilesAddedListener() {
 
             @Override
             public void onFilesAdded(PluploadFile[] files) {
-                PluploadFileConfig config = new PluploadFileConfig();
-                config.uploadPath = uploadPath;
-                config.chunkUploadedListeners = new WeakReference(chunkUploadedListeners);
-                config.saveFileOnDisk = saveFileOnDisk;
-                queue.addFiles(files, config);
+                for (PluploadFile file : files) {
+                    queue.addFile(file, chunkHandlerFactory.create(file, self));
+                }
             }
         });
     }
@@ -391,24 +389,6 @@ public class Plupload extends Button {
     }
 
     /**
-     * Check, if saving uploaded files on disk is enabled
-     *
-     * @return
-     */
-    public boolean isSaveFileOnDiskEnabled() {
-        return saveFileOnDisk;
-    }
-
-    /**
-     * Decide, if the uploaded files are to be saved on disk. Defaults to true
-     *
-     * @param saveFileOnDisk
-     */
-    public void setSaveFileOnDiskEnabled(boolean saveFileOnDisk) {
-        this.saveFileOnDisk = saveFileOnDisk;
-    }
-
-    /**
      * Set maximum file size accepted by this Uploader. Defaults to "1000mb"
      *
      * @param maxFileSize
@@ -563,27 +543,6 @@ public class Plupload extends Button {
     }
 
     /**
-     * Get the currently configured destination for uploaded files
-     *
-     * @return
-     */
-    public String getUploadPath() {
-        return uploadPath;
-    }
-
-    /**
-     * Set the destination for uploaded files. Defaults to the value of
-     * "java.io.tmpdir" System property
-     *
-     * @param uploadPath
-     * @return
-     */
-    public Plupload setUploadPath(String uploadPath) {
-        this.uploadPath = uploadPath;
-        return this;
-    }
-
-    /**
      * Stops the current upload process
      *
      * @return
@@ -600,6 +559,25 @@ public class Plupload extends Button {
         return this;
     }
 
+    /**
+     * Get currently configured chunk handler factory.
+     *
+     * @return
+     */
+    public PluploadChunkHandlerFactory getChunkHandlerFactory() {
+        return chunkHandlerFactory;
+    }
+
+    /**
+     * Set desired chunk handler factory. Defaults to
+     * FileAppendingChunkHandlerFactory
+     *
+     * @param chunkHandlerFactory
+     */
+    public void setChunkHandlerFactory(PluploadChunkHandlerFactory chunkHandlerFactory) {
+        this.chunkHandlerFactory = chunkHandlerFactory;
+    }
+
     protected PluploadCilentRpc getClient() {
         return this.getRpcProxy(PluploadCilentRpc.class);
     }
@@ -613,8 +591,6 @@ public class Plupload extends Button {
     private final Set<FileFilteredListener> fileFilteredListeners = new LinkedHashSet<>();
 
     private final Set<FileUploadedListener> fileUploadedListeners = new LinkedHashSet<>();
-
-    private final Set<ChunkUploadedListener> chunkUploadedListeners = new LinkedHashSet<>();
 
     private final Set<ErrorListener> errorListeners = new LinkedHashSet<>();
 
@@ -645,11 +621,6 @@ public class Plupload extends Button {
 
     public Plupload addFileUploadedListener(FileUploadedListener listener) {
         this.fileUploadedListeners.add(listener);
-        return this;
-    }
-
-    public Plupload addChunkUploadedListener(ChunkUploadedListener listener) {
-        this.chunkUploadedListeners.add(listener);
         return this;
     }
 
@@ -708,11 +679,6 @@ public class Plupload extends Button {
         return this;
     }
 
-    public Plupload removeChunkUploadedListener(ChunkUploadedListener listener) {
-        this.chunkUploadedListeners.remove(listener);
-        return this;
-    }
-
     public Plupload removeUploadProgressListener(UploadProgressListener listener) {
         this.uploadProgressListeners.remove(listener);
         return this;
@@ -761,11 +727,6 @@ public class Plupload extends Button {
     public interface FileFilteredListener extends Serializable {
 
         void onFileFiltered(PluploadFile file);
-    }
-
-    public interface ChunkUploadedListener extends Serializable {
-
-        void onChunkUploaded(PluploadChunk chunk);
     }
 
     public interface FileUploadedListener extends Serializable {

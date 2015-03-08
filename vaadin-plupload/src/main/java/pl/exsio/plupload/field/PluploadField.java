@@ -42,6 +42,7 @@ import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadChunk;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.ex.UnsupportedFieldTypeException;
+import pl.exsio.plupload.handler.memory.ByteArrayChunkHandlerFactory;
 import pl.exsio.plupload.util.PluploadUtil;
 import static pl.exsio.plupload.util.PluploadUtil.trimTextInTheMiddle;
 
@@ -97,6 +98,9 @@ public class PluploadField<T extends Object> extends CustomField<T> {
 
         this.uploader.setMultiSelection(false);
         this.uploader.setStyleName("plupload-field-uploader");
+        if (byte[].class.equals(this.returnTypeClass)) {
+            this.uploader.setChunkHandlerFactory(new ByteArrayChunkHandlerFactory());
+        }
 
         this.progressBar = new ProgressBar();
         this.progressBar.setIndeterminate(false);
@@ -141,46 +145,19 @@ public class PluploadField<T extends Object> extends CustomField<T> {
         this.handleFilesRemoved();
         this.handleUploadProgress();
         this.handleFileUploaded();
-        this.handleChunkUploaded();
 
     }
 
     private void handleFileUploaded() {
-        if (File.class.equals(this.returnTypeClass)) {
-            this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
 
-                @Override
-                public void onFileUploaded(PluploadFile file) {
-                    setValue((T) file.getUploadedFile());
-                }
-            });
-        }
-    }
+        this.uploader.addFileUploadedListener(new Plupload.FileUploadedListener() {
 
-    private void handleChunkUploaded() {
-        if (byte[].class.equals(this.returnTypeClass)) {
-            this.uploader.setSaveFileOnDiskEnabled(false);
-            this.uploader.addChunkUploadedListener(new Plupload.ChunkUploadedListener() {
+            @Override
+            public void onFileUploaded(PluploadFile file) {
+                setValue((T) file.getUploadedFile());
+            }
+        });
 
-                @Override
-                public void onChunkUploaded(PluploadChunk chunk) {
-                    try {
-                        if (chunk.isFirst()) {
-                            bos = new ByteArrayOutputStream();
-                        }
-                        PluploadUtil.copyInputStreamToOutputStream(chunk.getInputStream(), bos);
-                        if (chunk.isLast()) {
-                            setValue((T) bos.toByteArray());
-                            bos = null;
-                        }
-                    } catch (IOException ex) {
-                        setValue(null);
-                        Logger.getLogger(PluploadField.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
-            });
-        }
     }
 
     private void handleUploadProgress() {

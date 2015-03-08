@@ -53,7 +53,7 @@ public class PluploadFile implements Serializable {
 
     protected boolean uploaded = false;
 
-    protected transient File uploadedFile;
+    protected transient Object uploadedFile;
 
     /**
      * Get percentage of upload progress
@@ -173,16 +173,28 @@ public class PluploadFile implements Serializable {
     }
 
     /**
-     * Get the associated java.io.File instance, that was saved on the server
+     * Get the assicoated UploadedFile object
      *
      * @return
      */
-    public File getUploadedFile() {
+    public Object getUploadedFile() {
         return uploadedFile;
     }
 
-    void setUploadedFile(File uploadedFile) {
+    void setUploadedFile(Object uploadedFile) {
         this.uploadedFile = uploadedFile;
+    }
+
+    /**
+     * 
+     * Get the associated UploadedFile object as desired Type
+     * 
+     * @param <T>
+     * @param fileClass
+     * @return 
+     */
+    public <T extends Object> T getUploadedFileAs(Class<T> fileClass) {
+        return (T) this.uploadedFile;
     }
 
     /**

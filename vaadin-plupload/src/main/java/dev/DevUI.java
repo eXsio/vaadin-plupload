@@ -41,6 +41,7 @@ import pl.exsio.plupload.PluploadChunk;
 import pl.exsio.plupload.PluploadError;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.field.PluploadField;
+import pl.exsio.plupload.handler.memory.ByteArrayChunkHandlerFactory;
 import pl.exsio.plupload.helper.filter.PluploadFilter;
 import pl.exsio.plupload.helper.resize.PluploadImageResize;
 import pl.exsio.plupload.manager.PluploadManager;
@@ -115,7 +116,7 @@ public class DevUI extends UI {
         });
         mainLayout.addComponent(form);
         mainLayout.addComponent(submit);
-        
+
         PluploadField<byte[]> byteField = createByteUploadField();
         mainLayout.addComponent(byteField);
 
@@ -242,7 +243,7 @@ public class DevUI extends UI {
 
             @Override
             public void onFileUploaded(PluploadFile file) {
-                File uploadedFile = file.getUploadedFile();
+                File uploadedFile = file.getUploadedFileAs(File.class);
                 System.out.println("This file was just uploaded: " + uploadedFile.getAbsolutePath());
             }
         });
@@ -253,7 +254,7 @@ public class DevUI extends UI {
             public void onUploadComplete() {
                 System.out.println("Upload was completed");
                 for (PluploadFile file : uploader.getUploadedFiles()) {
-                    System.out.println("Uploaded file " + file.getName() + " is located: " + file.getUploadedFile().getAbsolutePath());
+                    System.out.println("Uploaded file " + file.getName() + " is located: " + file.getUploadedFileAs(File.class).getAbsolutePath());
                 }
             }
         });
@@ -279,14 +280,13 @@ public class DevUI extends UI {
     private PluploadManager createUploadManager(final String name) {
         final PluploadManager mgr = new PluploadManager();
         //mgr.getUploader().setUploadPath("/home/exsio");
-        System.out.println("upload path for " + name + ": " + mgr.getUploader().getUploadPath());
         mgr.getUploader().addUploadCompleteListener(new Plupload.UploadCompleteListener() {
 
             @Override
             public void onUploadComplete() {
                 System.out.println("Files uploaded by " + name + ": ");
                 for (PluploadFile file : mgr.getUploadedFiles()) {
-                    System.out.println(file.getUploadedFile().getAbsolutePath());
+                    System.out.println(file.getUploadedFileAs(File.class).getAbsolutePath());
                 }
             }
         });
@@ -313,31 +313,13 @@ public class DevUI extends UI {
 
     private PluploadManager createChunkingUploadManager(final String name) {
         final PluploadManager mgr = new PluploadManager();
-        mgr.getUploader().addChunkUploadedListener(new Plupload.ChunkUploadedListener() {
-
-            @Override
-            public void onChunkUploaded(PluploadChunk chunk) {
-
-                System.out.println("Uploded chunk " + chunk.getChunk() + "/" + chunk.getChunks() + " of file " + chunk.getName());
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                try {
-                    while ((bytesRead = chunk.getInputStream().read(buffer)) != -1) {
-                        output.write(buffer, 0, bytesRead);
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(DevUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                System.out.println("Size: " + output.toByteArray().length);
-            }
-        });
+        mgr.getUploader().setChunkHandlerFactory(new ByteArrayChunkHandlerFactory());
 
         mgr.getUploader().addFileUploadedListener(new Plupload.FileUploadedListener() {
 
             @Override
             public void onFileUploaded(PluploadFile file) {
-                Notification.show("file uploaded: " + file.getName());
+                Notification.show("file uploaded: " + file.getName() + ", size: " + file.getUploadedFileAs(byte[].class).length);
             }
         });
 
@@ -356,7 +338,6 @@ public class DevUI extends UI {
             }
         });
 
-        mgr.getUploader().setSaveFileOnDiskEnabled(false);
         mgr.getUploader().setChunkSize("1mb");
         mgr.getUploader().setMaxFileSize("50mb");
         mgr.getUploader().setMultiSelection(true);

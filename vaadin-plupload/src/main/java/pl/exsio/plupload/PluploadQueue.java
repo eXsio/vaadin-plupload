@@ -23,12 +23,13 @@
  */
 package pl.exsio.plupload;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import pl.exsio.plupload.ex.InvalidFileHandlerException;
+import pl.exsio.plupload.handler.PluploadChunkHandler;
 
 /**
  *
@@ -37,6 +38,8 @@ import java.util.Set;
 public class PluploadQueue implements Serializable {
 
     protected final Map<String, PluploadFile> queue;
+
+    protected final Map<String, PluploadChunkHandler> handlers;
 
     protected enum Mode {
 
@@ -47,32 +50,19 @@ public class PluploadQueue implements Serializable {
 
     public PluploadQueue() {
         this.queue = new LinkedHashMap<>();
+        this.handlers = new LinkedHashMap<>();
     }
 
-    public void clear(boolean deleteFiles) {
-        for (String fileId : this.queue.keySet()) {
-            PluploadFile file = this.queue.get(fileId);
-            if (deleteFiles && file.getUploadedFile() != null) {
-                file.getUploadedFile().delete();
-            }
-        }
-        this.queue.clear();
-    }
-
-    public void addFile(PluploadFile file, PluploadFileConfig config) {
+    public void addFile(PluploadFile file, PluploadChunkHandler fileHandler) {
         this.queue.put(file.getId(), file);
-        getReceiver().addExpectedFile(file.getId(), config);
-    }
-
-    public void addFiles(PluploadFile[] files, PluploadFileConfig config) {
-        for (PluploadFile file : files) {
-            this.addFile(file, config);
-        }
+        this.handlers.put(file.getId(), fileHandler);
+        getReceiver().addExpectedFile(file.getId(), fileHandler);
     }
 
     public void removeFile(String fileId) {
         if (this.queue.containsKey(fileId)) {
             this.queue.remove(fileId);
+            this.handlers.remove(fileId);
             getReceiver().removeExpectedFile(fileId);
         }
     }
@@ -87,10 +77,18 @@ public class PluploadQueue implements Serializable {
         return this.getFileIds(Mode.NOT_UPLOADED).isEmpty();
     }
 
-    public void setUploadedFile(String fileId, File uploadedFile) {
+    public void setUploadedFile(String fileId, Object uploadedFile) {
         if (this.queue.containsKey(fileId)) {
             this.queue.get(fileId).setUploadedFile(uploadedFile);
             this.queue.get(fileId).setUploaded(true);
+        }
+    }
+
+    public PluploadChunkHandler getFileHandler(String fileId) {
+        if (this.handlers.containsKey(fileId)) {
+            return this.handlers.get(fileId);
+        } else {
+            throw new InvalidFileHandlerException("there is no file handler for file " + fileId);
         }
     }
 
