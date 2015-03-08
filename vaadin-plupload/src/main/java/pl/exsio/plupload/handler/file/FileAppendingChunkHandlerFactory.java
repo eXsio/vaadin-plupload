@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package pl.exsio.plupload.handler.file;
 
 import pl.exsio.plupload.PluploadFile;
@@ -35,14 +34,18 @@ import pl.exsio.plupload.handler.PluploadChunkHandlerFactory;
 public class FileAppendingChunkHandlerFactory implements PluploadChunkHandlerFactory {
 
     protected String uploadPath;
-    
+
     public FileAppendingChunkHandlerFactory(String uploadPath) {
         this.uploadPath = uploadPath;
     }
-    
+
     @Override
     public PluploadChunkHandler create(PluploadFile file) {
         return new FileAppendingChunkHandler(this.uploadPath);
     }
-    
+
+    public String getUploadPath() {
+        return uploadPath;
+    }
+
 }

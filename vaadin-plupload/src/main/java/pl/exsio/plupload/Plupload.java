@@ -360,6 +360,34 @@ public class Plupload extends Button {
     }
 
     /**
+     * Get the currently configured destination for uploaded files. Works only,
+     * if the currently configured chunkHandlerFactory is an instance of
+     * FileAppendingChunkHandlerFactory (Which is the default one)
+     *
+     * @return
+     */
+    public String getUploadPath() {
+        if (this.chunkHandlerFactory instanceof FileAppendingChunkHandlerFactory) {
+            return ((FileAppendingChunkHandlerFactory) this.chunkHandlerFactory).getUploadPath();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is a shortcut method, that sets the configured chunkHandlerFactory
+     * to FileAppendingChunkHandlerFactory with the given uploadPath. The change
+     * won't affect files already added to the upload queue
+     *
+     * @param uploadPath
+     * @return
+     */
+    public Plupload setUploadPath(String uploadPath) {
+        this.chunkHandlerFactory = new FileAppendingChunkHandlerFactory(uploadPath);
+        return this;
+    }
+
+    /**
      * Add additional drop zone by it's Id. The Id cannot be empty and must be
      * unique.
      *
