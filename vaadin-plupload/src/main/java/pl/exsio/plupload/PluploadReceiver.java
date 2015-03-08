@@ -83,7 +83,7 @@ public class PluploadReceiver implements RequestHandler, Serializable {
                         }
                     } catch (Exception ex) {
                         response.getWriter().append("file upload unsuccessful, because of " + ex.getClass().getName() + ":" + ex.getMessage());
-                        throw new IOException("There was a problem during processing chunk. Nested exceptions may have more info.", ex);
+                        throw new IOException("There was a problem during processing of uploaded chunk. Nested exceptions may have more info.", ex);
                     }
                     return true;
                 }
