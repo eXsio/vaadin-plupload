@@ -23,7 +23,6 @@
  */
 package pl.exsio.plupload.handler.memory;
 
-import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.handler.PluploadChunkHandler;
 import pl.exsio.plupload.handler.PluploadChunkHandlerFactory;
@@ -35,7 +34,7 @@ import pl.exsio.plupload.handler.PluploadChunkHandlerFactory;
 public class ByteArrayChunkHandlerFactory implements PluploadChunkHandlerFactory {
 
     @Override
-    public PluploadChunkHandler create(PluploadFile file, Plupload uploader) {
+    public PluploadChunkHandler create(PluploadFile file) {
         return new ByteArrayChunkHandler();
     }
 

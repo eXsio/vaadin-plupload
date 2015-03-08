@@ -24,7 +24,6 @@
 package pl.exsio.plupload.handler;
 
 import java.io.Serializable;
-import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadFile;
 
 /**
@@ -33,5 +32,5 @@ import pl.exsio.plupload.PluploadFile;
  */
 public interface PluploadChunkHandlerFactory extends Serializable {
 
-    PluploadChunkHandler create(PluploadFile file, Plupload uploader);
+    PluploadChunkHandler create(PluploadFile file);
 }

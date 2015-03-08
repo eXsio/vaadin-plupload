@@ -24,7 +24,6 @@
 
 package pl.exsio.plupload.handler.file;
 
-import pl.exsio.plupload.Plupload;
 import pl.exsio.plupload.PluploadFile;
 import pl.exsio.plupload.handler.PluploadChunkHandler;
 import pl.exsio.plupload.handler.PluploadChunkHandlerFactory;
@@ -42,7 +41,7 @@ public class FileAppendingChunkHandlerFactory implements PluploadChunkHandlerFac
     }
     
     @Override
-    public PluploadChunkHandler create(PluploadFile file, Plupload uploader) {
+    public PluploadChunkHandler create(PluploadFile file) {
         return new FileAppendingChunkHandler(this.uploadPath);
     }
     

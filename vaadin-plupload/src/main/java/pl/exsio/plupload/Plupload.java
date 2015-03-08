@@ -173,13 +173,12 @@ public class Plupload extends Button {
     }
 
     private void handleFilesAdded() {
-        final Plupload self = this;
         this.addFilesAddedListener(new FilesAddedListener() {
 
             @Override
             public void onFilesAdded(PluploadFile[] files) {
                 for (PluploadFile file : files) {
-                    queue.addFile(file, chunkHandlerFactory.create(file, self));
+                    queue.addFile(file, chunkHandlerFactory.create(file));
                 }
             }
         });
