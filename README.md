@@ -205,7 +205,7 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
    - ```getUploadedFileAs(Class<T> cls)``` returns the above value casted to ```T```
 
 
-   By default, the UploadedFile will be an instance of ```java.io.File```, so in order to get it, You must call ```getUploadedFileAs(File.cass)```. If You decide to use ```ByteArrayChunkHandlerFactory```, the type will change to ```byte[]```. And if You implement Your own Handler, the UploadedFile will be whatever You choose.
+   By default, the UploadedFile will be an instance of ```java.io.File``` (```FileAppendingChunkHandlerFactory``` is in use), so in order to get it, You must call ```getUploadedFileAs(File.cass)```. If You decide to use ```ByteArrayChunkHandlerFactory```, the type will change to ```byte[]```. And if You implement Your own Handler, the UploadedFile will be whatever You choose.
   
   ### PluploadManager
   
