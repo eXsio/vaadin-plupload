@@ -194,6 +194,18 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
   Things to remember:
   - the input stream associated with each chunk will be valid only during the uploading request
   - Handlers cannot modify UI, because of their purely server side nature (they're being invoked directly by Receiver)
+   
+  Handlers available out of the box:
+  - ```FileAppendingChunkHandlerFactory```, which takes an uploadPath String as a constructor arg
+  - ```ByteArrayChunkHandlerFactory```
+
+
+   The PluploadFile object has the following means to obtain the UploadedFile itself
+   - ```getUploadedFile()``` returns an ```java.lang.Object```
+   - ```getUploadedFileAs(Class<T> cls)``` returns the above value casted to ```T```
+
+
+   By default, the UploadedFile will be an instance of ```java.io.File```, so in order to get it, You must call ```getUploadedFileAs(File.cass)```. If You decide to use ```ByteArrayChunkHandlerFactory```, the type will change to ```byte[]```. And if You implement Your own Handler, the UploadedFile will be whatever You choose.
   
   ### PluploadManager
   
