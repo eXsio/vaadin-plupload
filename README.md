@@ -82,14 +82,6 @@ There are 3 main components in this add-on:
  - Destroy
  ```
  
- Server-side events
- ```
- - ChunkUploaded
- ```
-
-  You cannot update the UI or any other Vaadin related stuff in the handlers of server-side events. That is, because
-  server side events are executed by a separate RequestHandler that is not aware of an UI.
- 
   Example usage of the Plupload component:
   
   ```
@@ -193,6 +185,27 @@ Uploaded file test.flac is located at: /tmp/o_199r9ll9e1g6q15vmrdj13l51rdbl.flac
   ```
   
   Although in this case, the callbacks affected the server side (wrote something into the server console), You can update client components (Labels, ProgressBars etc) this way as well. Which brings us to the second component...
+  
+  
+  ### Server side upload handling
+  
+  There are many things, that programmer would want to do with the uploaded file(s). Some would want to keep it's reference in an ```java.io.File``` instance, others store it in ```byte[]``` array in memory... but what if one would want to do something else? Well, You can implement the behaviour Yourself! All You need to do is implement 2 Interfaces: ```PluploadChunkHandlerFactory```, which will produce a ```PluploadChunkHandler``` for each and every file added to the queue. The handler will decide, what to do with uploaded chunks. Every time a chunk of file is uploaded, the Handler will be given an instance of PluploadChunk, which in turn will contain all the info necessary for further processing. 
+  
+  Things to remember:
+  - the input stream associated with each chunk will be valid only during the uploading request
+  - Handlers cannot modify UI, because of their purely server side nature (they're being invoked directly by Receiver)
+   
+  Handlers available out of the box:
+  - ```FileAppendingChunkHandlerFactory```, which takes an uploadPath String as a constructor arg
+  - ```ByteArrayChunkHandlerFactory```
+
+
+   The PluploadFile object has the following means to obtain the UploadedFile itself
+   - ```getUploadedFile()``` returns an ```java.lang.Object```
+   - ```getUploadedFileAs(Class<T> cls)``` returns the above value casted to ```T```
+
+
+   By default, the UploadedFile will be an instance of ```java.io.File``` (```FileAppendingChunkHandlerFactory``` is in use), so in order to get it, You must call ```getUploadedFileAs(File.cass)```. If You decide to use ```ByteArrayChunkHandlerFactory```, the type will change to ```byte[]```. And if You implement Your own Handler, the UploadedFile will be whatever You choose.
   
   ### PluploadManager
   
