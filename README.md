@@ -8,8 +8,7 @@ The MIT license concernes olny the addon. If You want to use Plupload, please fa
 
 ### Online demo
 
-Here's the demo with some basic examples: http://vaadin-plupload.jelastic.servint.net/examples/
-
+Here's the demo with some basic examples: http://vaadin-plupload.exsio.eu/plupload-vaadin-examples/
 ---
 
 ### Installation
